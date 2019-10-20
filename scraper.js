@@ -24,6 +24,7 @@ function sleep(ms){
   })
 }
 
+// get random number for sleep timer
 function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -78,8 +79,6 @@ const getResults = async () => {
       price: [...price],
       pageNum
     });
-    console.log(totalNumberOfPages)
-    console.log(pageNum)
     await sleep(getRandomInt(5000, 20000));
   } while (totalNumberOfPages > pageNum)
   return productArray;
