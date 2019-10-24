@@ -42,11 +42,43 @@ const getResults = async () => {
   // create db path reference
   let ref = db.ref("scrapedPages/");
   let dateToString = date.toString();
-  // prep db reference by adding a timestamp
+  // prep db references by adding a timestamp
+  let pageRefBestSellers = ref.child('OCS-best-sellers-on-' + dateToString);
   let pageRef = ref.child('OCS-full-product-listing-scrape-on-' + dateToString);
+  // best sellers stuff
+  let bestSellersArray = [];
+  let bestSellersVendor = [];
+  let bestSellersTitle = [];
+  let bestSellersPlantType = [];
+  let bestSellersTHCrange = [];
+  let bestSellersCBDrange = [];
+  let bestSellersPrice = [];
 
   do {
     const $ = await fetchData();
+    // only grab the best sellers data once.
+    if (pageNum == 2) {
+      let refToTopSellers = $('.slick-slide');
+      // get top seller list
+      refToTopSellers.each((index, element) => {
+        bestSellersVendor.push($('.product-tile__info .product-tile__vendor', element).text());
+        bestSellersTitle.push($(' .product-tile__info .product-tile__title', element).text());
+        bestSellersPlantType.push($('.product-tile__info .product-tile__plant-type p', element).text());
+        bestSellersTHCrange.push($('.product-tile__properties li:nth-child(2) p', element).text());
+        bestSellersCBDrange.push($('.product-tile__properties li:nth-child(3) p', element).text());
+        bestSellersPrice.push($('product-tile__price', element).text());
+      });
+      // once done iterating through the best sellers, prep to send to db
+      bestSellersArray.push ({
+        vendors: [...bestSellersVendor],
+        productTitle: [...bestSellersTitle],
+        plantType: [...bestSellersPlantType],
+        thcRange: [...bestSellersTHCrange],
+        cbdRange: [...bestSellersCBDrange],
+        price: [...bestSellersPrice],
+        date
+      });
+    }
     // first check how many total pages there are
     totalNumberOfPages = parseInt($('.pagination li:nth-last-child(2)').text());
 
@@ -98,6 +130,8 @@ const getResults = async () => {
   } while (totalNumberOfPages > pageNum);
   // send data to DB
   pageRef.set(productArray);
+  pageRefBestSellers.set(bestSellersArray);
+  console.log('arr', bestSellersArray);
 
   return productArray;
 };
