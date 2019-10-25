@@ -175,7 +175,7 @@ const getResults = async () => {
         date
       });
     }
-    await sleep(getRandomInt(5000, 20000));
+    await sleep(getRandomInt(3000, 8000));
   } while (totalNumberOfPages > pageNum);
   ////////////////////////////////////////
   //
