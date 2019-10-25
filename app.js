@@ -47,4 +47,4 @@ app.use(function(err, req, res, next) {
 module.exports = app;
 
 const port = 9000;
-app.listen(port, () => console.log('App listening'))
+app.listen(port, () => console.log('App starting...'))
