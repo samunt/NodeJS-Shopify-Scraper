@@ -40,7 +40,7 @@ app.use(function(err, req, res, next) {
 });
 
 (async function() {
-  const result = await getResults();
+  await getResults();
 })();
 
 
