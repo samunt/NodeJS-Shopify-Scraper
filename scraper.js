@@ -73,7 +73,7 @@ const getResults = async () => {
 
   ///////////////////////////////
   //
-  // FULL LISTING FROM bccannabisstores BELOW
+  // FETCH FULL LISTING FROM bccannabisstores BELOW
   //
   ///////////////////////////////
   // reset pageNum variable
@@ -130,7 +130,7 @@ const getResults = async () => {
 
   ///////////////////////////////
   //
-  // FULL LISTING FROM bccannabisstores ABOVE
+  // FETCH FULL LISTING FROM bccannabisstores ABOVE
   //
   ///////////////////////////////
 
@@ -140,6 +140,7 @@ const getResults = async () => {
   //
   ////////////////////////////////////////
   // send data to DB
+  console.log('SENDING BC....')
   pageRefBCfullListing.set(productArray);
   // pageRefBestSellers.set(bestSellersArray);
   ////////////////////////////////////////
@@ -151,7 +152,7 @@ const getResults = async () => {
 
   ///////////////////////////////
   //
-  //  BEST SELLERS FROM OCS BELOW
+  //  FETCH BEST SELLERS FROM OCS BELOW
   //
   ///////////////////////////////
   $ = await fetchDataForOCSbestSellers();
@@ -192,13 +193,13 @@ const getResults = async () => {
   });
   ////////////////////////////////////////
   //
-  //  BEST SELLERS FROM OCS ABOVE
+  //  FETCH BEST SELLERS FROM OCS ABOVE
   //
   ////////////////////////////////////////
 
   ////////////////////////////////////////
   //
-  //  FULL PRODUCT LISTING FROM OCS BELOW
+  //  FETCH FULL PRODUCT LISTING FROM OCS BELOW
   //
   ////////////////////////////////////////
   vendor = [];
@@ -247,7 +248,6 @@ const getResults = async () => {
     if (pageNum <= totalNumberOfPages) {
       pageNum ++;
     };
-    console.log(pageNum)
     // Convert to an array so that we can sort the results.
     // we need the IF because when you click to go to the next page, it just appends the product list with new data
     // so that means that the last page will have all the data, only if we went thru the pages from 1 .. n, one at a time
@@ -267,7 +267,7 @@ const getResults = async () => {
   } while (totalNumberOfPages > pageNum);
   ////////////////////////////////////////
   //
-  //  FULL PRODUCT LISTING FROM OCS ABOVE
+  //  FETCH FULL PRODUCT LISTING FROM OCS ABOVE
   //
   ////////////////////////////////////////
 
@@ -277,7 +277,9 @@ const getResults = async () => {
   //
   ////////////////////////////////////////
   // send data to DB
+  console.log('SENDING OCS FULL LIST....')
   pageRefOCSfullListing.set(productArray);
+  console.log('SENDING OCS BEST SELLERS....')
   pageRefBestSellers.set(bestSellersArray);
   ////////////////////////////////////////
   //
