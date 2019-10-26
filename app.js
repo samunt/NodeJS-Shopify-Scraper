@@ -3,7 +3,6 @@ let express = require('express');
 let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
-
 const getResults = require("./scraper");
 
 let app = express();
@@ -39,10 +38,10 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+// self executing func to trigger the scraper
 (async function() {
   await getResults();
 })();
-
 
 module.exports = app;
 

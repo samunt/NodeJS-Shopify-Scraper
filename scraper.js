@@ -4,6 +4,14 @@ const admin = require("firebase-admin");
 const date = new Date();
 // pageNum is used for traverse the product listings pages and needs to be at this level
 let pageNum = 1;
+// $ is used for promises returned from url fetch
+let $;
+
+const fetchDataForBCfullProductListing = async () => {
+  let url = "https://www.bccannabisstores.com/collections/cannabis-products?page=" + pageNum + "&grid_list=grid-view"
+  const result = await axios.get(url);
+  return cheerio.load(result.data);
+}
 
 // called by getResults()
 const fetchDataForOCSfullProductListings = async () => {
@@ -43,7 +51,8 @@ const getResults = async () => {
   let dateToString = date.toString();
   // prep db references by adding a timestamp
   let pageRefBestSellers = ref.child('OCS-best-sellers-on-' + dateToString);
-  let pageRef = ref.child('OCS-full-product-listing-scrape-on-' + dateToString);
+  let pageRefOCSfullListing = ref.child('OCS-full-product-listing-scrape-on-' + dateToString);
+  let pageRefBCfullListing = ref.child('BC-full-product-listing-scrape-on-' + dateToString);
   // best sellers stuff
   let bestSellersArray = [];
   let bestSellersVendor = [];
@@ -53,11 +62,71 @@ const getResults = async () => {
   let bestSellersCBDrange = [];
   let bestSellersPrice = [];
 
+  let vendor = [];
+  let productTitle = [];
+  let plantType = [];
+  let thcRange = [];
+  let cbdRange = [];
+  let price = [];
+
+
+
   ///////////////////////////////
   //
   // FULL LISTING FROM bccannabisstores BELOW
   //
   ///////////////////////////////
+  // reset pageNum variable
+  pageNum = 1;
+  productArray = [];
+  productTitle = [];
+  plantType = [];
+  thcRange = [];
+  cbdRange = [];
+  price = [];
+  vendor = [];
+  let totalNumberOfPages = 1;
+
+  // do statement is for the page iterator
+  do {
+    $ = await fetchDataForBCfullProductListing();
+    // only need to do this once
+    if (pageNum === 1) {
+      totalNumberOfPages = parseInt($('.pagination--inner li:nth-last-child(2) a').text());
+    }
+    $('.productitem--title a span').each((index, element) => {
+      productTitle.push($(element).text());
+    });
+    $('.productitem--vendor').each((index, element) => {
+      vendor.push($(element).text());
+    });
+    $('.price--main .money').each((index, element) => {
+      price.push($(element).text());
+    });
+    $('.productitem--strain-characteristics span:nth-child(1)').each((index, element) => {
+      thcRange.push($(element).text());
+    });
+    $('.productitem--strain-characteristics span:nth-child(2)').each((index, element) => {
+      cbdRange.push($(element).text());
+      plantType.push('Not Available');
+    });
+    // Convert to an array so that we can sort the results.
+    // we need the IF because when you click to go to the next page, it just appends the product list with new data
+    // so that means that the last page will have all the data, only if we went thru the pages from 1 .. n, one at a time
+    if (totalNumberOfPages == pageNum) {
+      productArray.push ({
+        vendors: [...vendor],
+        productTitle: [...productTitle],
+        plantType: [...plantType],
+        thcRange: [...thcRange],
+        cbdRange: [...cbdRange],
+        price: [...price],
+        date
+      });
+    };
+    pageNum++;
+    await sleep(getRandomInt(3000, 8000));
+  } while (totalNumberOfPages > pageNum);
 
   ///////////////////////////////
   //
@@ -65,12 +134,27 @@ const getResults = async () => {
   //
   ///////////////////////////////
 
+  ////////////////////////////////////////
+  //
+  //  SEND bccannabisstore DATA SETS TO FIREBASE BELOW
+  //
+  ////////////////////////////////////////
+  // send data to DB
+  pageRefBCfullListing.set(productArray);
+  // pageRefBestSellers.set(bestSellersArray);
+  ////////////////////////////////////////
+  //
+  //  SEND bccannabisstore DATA SETS TO FIREBASE ABOVE
+  //
+  ////////////////////////////////////////
+
+
   ///////////////////////////////
   //
   //  BEST SELLERS FROM OCS BELOW
   //
   ///////////////////////////////
-  let $ = await fetchDataForOCSbestSellers();
+  $ = await fetchDataForOCSbestSellers();
   // grab vendor
   $('.product-carousel__products article h4').each((index, element) => {
     if (index === 0 || index % 3 === 0) {
@@ -117,19 +201,22 @@ const getResults = async () => {
   //  FULL PRODUCT LISTING FROM OCS BELOW
   //
   ////////////////////////////////////////
-  let vendor = [];
-  let productTitle = [];
-  let plantType = [];
-  let thcRange = [];
-  let cbdRange = [];
-  let price = [];
-  let totalNumberOfPages = 1;
+  vendor = [];
+  productTitle = [];
+  plantType = [];
+  thcRange = [];
+  cbdRange = [];
+  price = [];
+  totalNumberOfPages = 1;
+  productArray = [];
+  pageNum = 1;
 
   do {
     $ = await fetchDataForOCSfullProductListings();
-    // first check how many total pages there are
-    totalNumberOfPages = parseInt($('.pagination li:nth-last-child(2)').text());
-
+    // first check how many total pages there are - only need to do once
+    if (pageNum === 1) {
+      totalNumberOfPages = parseInt($('.pagination li:nth-last-child(2)').text());
+    }
     // use fetched data to grab elements (and their text) and push into arrays defined above
     // get vendor
     $('.product-tile__vendor').each((index, element) => {
@@ -175,6 +262,7 @@ const getResults = async () => {
         date
       });
     }
+    pageNum++;
     await sleep(getRandomInt(3000, 8000));
   } while (totalNumberOfPages > pageNum);
   ////////////////////////////////////////
@@ -189,7 +277,7 @@ const getResults = async () => {
   //
   ////////////////////////////////////////
   // send data to DB
-  pageRef.set(productArray);
+  pageRefOCSfullListing.set(productArray);
   pageRefBestSellers.set(bestSellersArray);
   ////////////////////////////////////////
   //
