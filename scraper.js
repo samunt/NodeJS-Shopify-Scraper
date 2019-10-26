@@ -68,7 +68,6 @@ const getResults = async () => {
 
   // do statement is for the page iterator
   do {
-    console.log('pagenum BC', pageNumBC);
     $ = await fetchDataForBCfullProductListing();
     // only need to do this once
     if (pageNumBC == 1) {
@@ -181,7 +180,6 @@ const getResults = async () => {
   let pageNumOCS = 1;
 
   do {
-    console.log('PAGE NUM OCS', pageNumOCS);
     $ = await fetchDataForOCSfullProductListings(pageNumOCS);
     // first check how many total pages there are - only need to do once
     if (pageNumOCS === 1) {
@@ -191,7 +189,6 @@ const getResults = async () => {
     // get vendor
     $('.product-tile__vendor').each((index, element) => {
       vendorOCS.push($(element).text());
-      // console.log('OCS el', $(element).text())
     });
     // grab product title
     $('.product-tile__title').each((index, element) => {
@@ -218,7 +215,6 @@ const getResults = async () => {
     // we need the IF because when you click to go to the next page, it just appends the product list with new data
     // so that means that the last page will have all the data, only if we went thru the pages from 1 .. n, one at a time
     if (totalNumberOfPagesOCS == pageNumOCS) {
-      console.log('FILL UP OCS ARRAY=======================')
       productArrayOCS.push ({
         vendors: [...vendorOCS],
         productTitle: [...productTitleOCS],
@@ -243,18 +239,15 @@ const getResults = async () => {
   //
   ////////////////////////////////////////
   // send data to DB
-  console.log('here 250');
   pageRefOCS.set(productArrayOCS);
-  // console.log('OCS PRODUCT LISTING', productArrayOCS)
   pageRefBestSellersOCS.set(bestSellersArrayOCS);
   pageRefBC.set(productArrayBC);
-  console.log('here 254')
   ////////////////////////////////////////
   //
   //  SEND DATA SETS TO FIREBASE ABOVE
   //
   ////////////////////////////////////////
-  return true;
+  return;
 };
 
 module.exports = getResults;
