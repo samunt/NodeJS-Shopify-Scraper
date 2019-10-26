@@ -2,20 +2,18 @@ const cheerio = require("cheerio");
 const axios = require("axios");
 const admin = require("firebase-admin");
 const date = new Date();
-// pageNum is used for traverse the product listings pages and needs to be at this level
-let pageNum = 1;
 // $ is used for promises returned from url fetch
 let $;
 
-const fetchDataForBCfullProductListing = async () => {
-  let url = "https://www.bccannabisstores.com/collections/cannabis-products?page=" + pageNum + "&grid_list=grid-view"
+const fetchDataForBCfullProductListing = async (pageNumBC) => {
+  let url = "https://www.bccannabisstores.com/collections/cannabis-products?page=" + pageNumBC + "&grid_list=grid-view"
   const result = await axios.get(url);
   return cheerio.load(result.data);
 }
 
 // called by getResults()
-const fetchDataForOCSfullProductListings = async () => {
-  let url = "https://ocs.ca/collections/all-cannabis-products?&page=" + pageNum
+const fetchDataForOCSfullProductListings = async (pageNumOCS) => {
+  let url = "https://ocs.ca/collections/all-cannabis-products?&page=" + pageNumOCS
   const result = await axios.get(url);
   return cheerio.load(result.data);
 };
@@ -43,257 +41,220 @@ function getRandomInt(min, max) {
 
 // this function is called first
 const getResults = async () => {
-  let productArray = [];
   // Get a database reference to our blog
   let db = admin.database();
   // create db path reference
   let ref = db.ref("scrapedPages/");
   let dateToString = date.toString();
   // prep db references by adding a timestamp
-  let pageRefBestSellers = ref.child('OCS-best-sellers-on-' + dateToString);
-  let pageRefOCSfullListing = ref.child('OCS-full-product-listing-scrape-on-' + dateToString);
-  let pageRefBCfullListing = ref.child('BC-full-product-listing-scrape-on-' + dateToString);
-  // best sellers stuff
-  let bestSellersArray = [];
-  let bestSellersVendor = [];
-  let bestSellersTitle = [];
-  let bestSellersPlantType = [];
-  let bestSellersTHCrange = [];
-  let bestSellersCBDrange = [];
-  let bestSellersPrice = [];
-
-  let vendor = [];
-  let productTitle = [];
-  let plantType = [];
-  let thcRange = [];
-  let cbdRange = [];
-  let price = [];
-
-
-
+  let pageRefBestSellersOCS = ref.child('OCS-best-sellers-on-' + dateToString);
+  let pageRefOCS = ref.child('OCS-full-product-listing-scrape-on-' + dateToString);
+  let pageRefBC = ref.child('BC-full-product-listing-scrape-on-' + dateToString);
   ///////////////////////////////
   //
-  // FETCH FULL LISTING FROM bccannabisstores BELOW
+  // FULL LISTING FROM bccannabisstores BELOW
   //
   ///////////////////////////////
   // reset pageNum variable
-  pageNum = 1;
-  productArray = [];
-  productTitle = [];
-  plantType = [];
-  thcRange = [];
-  cbdRange = [];
-  price = [];
-  vendor = [];
-  let totalNumberOfPages = 1;
+  let productArrayBC = [];
+  let productTitleBC = [];
+  let plantTypeBC = [];
+  let thcRangeBC = [];
+  let cbdRangeBC = [];
+  let priceBC = [];
+  let vendorBC = [];
+  let totalNumberOfPagesBC = 1;
+  let pageNumBC = 1;
 
   // do statement is for the page iterator
   do {
+    console.log('pagenum BC', pageNumBC);
     $ = await fetchDataForBCfullProductListing();
     // only need to do this once
-    if (pageNum === 1) {
-      totalNumberOfPages = parseInt($('.pagination--inner li:nth-last-child(2) a').text());
+    if (pageNumBC == 1) {
+      totalNumberOfPagesBC = parseInt($('.pagination--inner li:nth-last-child(2) a').text());
     }
     $('.productitem--title a span').each((index, element) => {
-      productTitle.push($(element).text());
+      productTitleBC.push($(element).text());
     });
     $('.productitem--vendor').each((index, element) => {
-      vendor.push($(element).text());
+      vendorBC.push($(element).text());
     });
     $('.price--main .money').each((index, element) => {
-      price.push($(element).text());
+      priceBC.push($(element).text());
     });
     $('.productitem--strain-characteristics span:nth-child(1)').each((index, element) => {
-      thcRange.push($(element).text());
+      thcRangeBC.push($(element).text());
     });
     $('.productitem--strain-characteristics span:nth-child(2)').each((index, element) => {
-      cbdRange.push($(element).text());
-      plantType.push('Not Available');
+      cbdRangeBC.push($(element).text());
+      plantTypeBC.push('Not Available')
     });
-    // Convert to an array so that we can sort the results.
-    // we need the IF because when you click to go to the next page, it just appends the product list with new data
-    // so that means that the last page will have all the data, only if we went thru the pages from 1 .. n, one at a time
-    if (totalNumberOfPages == pageNum) {
-      productArray.push ({
-        vendors: [...vendor],
-        productTitle: [...productTitle],
-        plantType: [...plantType],
-        thcRange: [...thcRange],
-        cbdRange: [...cbdRange],
-        price: [...price],
-        date
-      });
-    };
-    pageNum++;
+    pageNumBC++;
     await sleep(getRandomInt(3000, 8000));
-  } while (totalNumberOfPages > pageNum);
+  } while (totalNumberOfPagesBC > pageNumBC);
+
+  productArrayBC.push ({
+    vendors: [...vendorBC],
+    productTitle: [...productTitleBC],
+    plantType: [...plantTypeBC],
+    thcRange: [...thcRangeBC],
+    cbdRange: [...cbdRangeBC],
+    price: [...priceBC],
+    date
+  });
+  ///////////////////////////////
+  //
+  // FULL LISTING FROM bccannabisstores ABOVE
+  //
+  ///////////////////////////////
 
   ///////////////////////////////
   //
-  // FETCH FULL LISTING FROM bccannabisstores ABOVE
+  //  BEST SELLERS FROM OCS BELOW
   //
   ///////////////////////////////
-
-  ////////////////////////////////////////
-  //
-  //  SEND bccannabisstore DATA SETS TO FIREBASE BELOW
-  //
-  ////////////////////////////////////////
-  // send data to DB
-  console.log('SENDING BC....')
-  pageRefBCfullListing.set(productArray);
-  // pageRefBestSellers.set(bestSellersArray);
-  ////////////////////////////////////////
-  //
-  //  SEND bccannabisstore DATA SETS TO FIREBASE ABOVE
-  //
-  ////////////////////////////////////////
-
-
-  ///////////////////////////////
-  //
-  //  FETCH BEST SELLERS FROM OCS BELOW
-  //
-  ///////////////////////////////
+  // best sellers stuff
+  let bestSellersVendorOCS = [];
+  let bestSellersTitleOCS = [];
+  let bestSellersPlantTypeOCS = [];
+  let bestSellersTHCrangeOCS = [];
+  let bestSellersCBDrangeOCS = [];
+  let bestSellersPriceOCS = [];
+  let bestSellersArrayOCS = [];
+  $ = undefined;
   $ = await fetchDataForOCSbestSellers();
   // grab vendor
   $('.product-carousel__products article h4').each((index, element) => {
     if (index === 0 || index % 3 === 0) {
-      bestSellersVendor.push($(element).text());
+      bestSellersVendorOCS.push($(element).text());
     }
   });
   // grab title
   $('.product-carousel__products .product-tile__data h3').each((index, element) => {
-      bestSellersTitle.push($(element).text());
+      bestSellersTitleOCS.push($(element).text());
   });
   // grab plant type
   $('.product-carousel__products .product-tile__properties li:nth-child(1) p').each((index, element) => {
-      bestSellersPlantType.push($(element).text());
+      bestSellersPlantTypeOCS.push($(element).text());
   });
   // grab thc range
   $('.product-carousel__products .product-tile__properties li:nth-child(2) p').each((index, element) => {
-    bestSellersTHCrange.push($(element).text());
+    bestSellersTHCrangeOCS.push($(element).text());
   });
   //grab cbd range
   $('.product-carousel__products .product-tile__properties li:nth-child(3) p').each((index, element) => {
-    bestSellersCBDrange.push($(element).text());
+    bestSellersCBDrangeOCS.push($(element).text());
   });
   $('.product-carousel__products .product-tile__info .product-tile__price').each((index, element) => {
-    bestSellersPrice.push($(element).text());
+    bestSellersPriceOCS.push($(element).text());
   });
 
-  bestSellersArray.push ({
-    vendors: [...bestSellersVendor],
-    productTitle: [...bestSellersTitle],
-    plantType: [...bestSellersPlantType],
-    thcRange: [...bestSellersTHCrange],
-    cbdRange: [...bestSellersCBDrange],
-    price: [...bestSellersPrice],
+  bestSellersArrayOCS.push ({
+    vendors: [...bestSellersVendorOCS],
+    productTitle: [...bestSellersTitleOCS],
+    plantType: [...bestSellersPlantTypeOCS],
+    thcRange: [...bestSellersTHCrangeOCS],
+    cbdRange: [...bestSellersCBDrangeOCS],
+    price: [...bestSellersPriceOCS],
     date
   });
   ////////////////////////////////////////
   //
-  //  FETCH BEST SELLERS FROM OCS ABOVE
+  //  BEST SELLERS FROM OCS ABOVE
   //
   ////////////////////////////////////////
 
   ////////////////////////////////////////
   //
-  //  FETCH FULL PRODUCT LISTING FROM OCS BELOW
+  //  FULL PRODUCT LISTING FROM OCS BELOW
   //
   ////////////////////////////////////////
-  vendor = [];
-  productTitle = [];
-  plantType = [];
-  thcRange = [];
-  cbdRange = [];
-  price = [];
-  totalNumberOfPages = 1;
-  productArray = [];
-  pageNum = 1;
+  let vendorOCS = [];
+  let productTitleOCS = [];
+  let plantTypeOCS = [];
+  let thcRangeOCS = [];
+  let cbdRangeOCS = [];
+  let priceOCS = [];
+  let totalNumberOfPagesOCS = 1;
+  let productArrayOCS = [];
+  let pageNumOCS = 1;
 
   do {
-    $ = await fetchDataForOCSfullProductListings();
+    console.log('PAGE NUM OCS', pageNumOCS);
+    $ = await fetchDataForOCSfullProductListings(pageNumOCS);
     // first check how many total pages there are - only need to do once
-    if (pageNum === 1) {
-      totalNumberOfPages = parseInt($('.pagination li:nth-last-child(2)').text());
+    if (pageNumOCS === 1) {
+      totalNumberOfPagesOCS = parseInt($('.pagination li:nth-last-child(2)').text());
     }
     // use fetched data to grab elements (and their text) and push into arrays defined above
     // get vendor
     $('.product-tile__vendor').each((index, element) => {
-      vendor.push($(element).text());
+      vendorOCS.push($(element).text());
+      // console.log('OCS el', $(element).text())
     });
     // grab product title
     $('.product-tile__title').each((index, element) => {
-      productTitle.push($(element).text());
+      productTitleOCS.push($(element).text());
      });
     // grab plant type
     $('.product-tile__plant-type').each((index, element) => {
-      plantType.push($(element).text());
+      plantTypeOCS.push($(element).text());
     });
     // grab thc range
     $('.product-tile__properties  li:nth-child(2) p').each((index, element) => {
-      thcRange.push($(element).text());
+      thcRangeOCS.push($(element).text());
     });
     // grab cbd range
     $('.product-tile__properties  li:nth-child(3) p').each((index, element) => {
-      cbdRange.push($(element).text());
+      cbdRangeOCS.push($(element).text());
     });
     // grab price
     $('.product-tile__price').each((index, element) => {
-      price.push($(element).text());
+      priceOCS.push($(element).text());
     });
-
-    // increment page number to get more products if the page count is less than total number of pages
-    if (pageNum <= totalNumberOfPages) {
-      pageNum ++;
-    };
+    pageNumOCS ++;
     // Convert to an array so that we can sort the results.
     // we need the IF because when you click to go to the next page, it just appends the product list with new data
     // so that means that the last page will have all the data, only if we went thru the pages from 1 .. n, one at a time
-    if (totalNumberOfPages == pageNum) {
-      productArray.push ({
-        vendors: [...vendor],
-        productTitle: [...productTitle],
-        plantType: [...plantType],
-        thcRange: [...thcRange],
-        cbdRange: [...cbdRange],
-        price: [...price],
+    if (totalNumberOfPagesOCS == pageNumOCS) {
+      console.log('FILL UP OCS ARRAY=======================')
+      productArrayOCS.push ({
+        vendors: [...vendorOCS],
+        productTitle: [...productTitleOCS],
+        plantType: [...plantTypeOCS],
+        thcRange: [...thcRangeOCS],
+        cbdRange: [...cbdRangeOCS],
+        price: [...priceOCS],
         date
       });
     }
-    pageNum++;
     await sleep(getRandomInt(3000, 8000));
-  } while (totalNumberOfPages > pageNum);
+  } while (totalNumberOfPagesOCS > pageNumOCS);
   ////////////////////////////////////////
   //
-  //  FETCH FULL PRODUCT LISTING FROM OCS ABOVE
+  //  FULL PRODUCT LISTING FROM OCS ABOVE
   //
   ////////////////////////////////////////
 
   ////////////////////////////////////////
   //
-  //  SEND OCS DATA SETS TO FIREBASE BELOW
+  //  SEND DATA SETS TO FIREBASE BELOW
   //
   ////////////////////////////////////////
   // send data to DB
-  console.log('SENDING OCS FULL LIST....')
-  pageRefOCSfullListing.set(productArray);
-  console.log('SENDING OCS BEST SELLERS....')
-  pageRefBestSellers.set(bestSellersArray);
+  console.log('here 250');
+  pageRefOCS.set(productArrayOCS);
+  // console.log('OCS PRODUCT LISTING', productArrayOCS)
+  pageRefBestSellersOCS.set(bestSellersArrayOCS);
+  pageRefBC.set(productArrayBC);
+  console.log('here 254')
   ////////////////////////////////////////
   //
-  //  SEND OCS DATA SETS TO FIREBASE ABOVE
+  //  SEND DATA SETS TO FIREBASE ABOVE
   //
   ////////////////////////////////////////
-  return productArray;
+  return true;
 };
 
 module.exports = getResults;
-
-// figure out what type of product
-// How to figure out what the product is
-// OIL => price == per bottle && name !HAS "spray"
-// DRY BUD => price == per gram
-// PRE-ROLL => price == per pack
-// CAPSULE => price == per bottle && name HAS "gels" or "capsules"
