@@ -5,15 +5,27 @@ const date = new Date();
 // $ is used for promises returned from url fetch
 let $;
 
+// const fetchDataForQCfullProductList = async (pageNumQC) => {
+//   let url = "https://www.sqdc.ca/en-CA/Search?keywords=*&sortDirection=asc&page=" + pageNumQC;
+//   const result = await axios.get(url);
+//   return cheero.load(result.data);
+// };
+//
+// const fetchIndividualProductDataForQC = async (productURL) => {
+//   let url = productURL;
+//   const result = await axios.get(url);
+//   return cheerio.load(result.data);
+// };
+
 const fetchDataForBCfullProductListing = async (pageNumBC) => {
-  let url = "https://www.bccannabisstores.com/collections/cannabis-products?page=" + pageNumBC + "&grid_list=grid-view"
+  let url = "https://www.bccannabisstores.com/collections/cannabis-products?page=" + pageNumBC + "&grid_list=grid-view";
   const result = await axios.get(url);
   return cheerio.load(result.data);
-}
+};
 
 // called by getResults()
 const fetchDataForOCSfullProductListings = async (pageNumOCS) => {
-  let url = "https://ocs.ca/collections/all-cannabis-products?&page=" + pageNumOCS
+  let url = "https://ocs.ca/collections/all-cannabis-products?&page=" + pageNumOCS;
   const result = await axios.get(url);
   return cheerio.load(result.data);
 };
@@ -50,12 +62,48 @@ const getResults = async () => {
   let pageRefBestSellersOCS = ref.child('OCS-best-sellers-on-' + dateToString);
   let pageRefOCS = ref.child('OCS-full-product-listing-scrape-on-' + dateToString);
   let pageRefBC = ref.child('BC-full-product-listing-scrape-on-' + dateToString);
+  let pageRefQC = ref.child('QC-full-product-listing-scrape-on-' + dateToString);
+  ///////////////////////////////
+  //
+  // FULL LISTING FROM quebec BELOW
+  //
+  ///////////////////////////////
+  let productArrayQC = [];
+  let productTitleQC = [];
+  let plantTypeQC = [];
+  let thcRangeQC = [];
+  let cbdRangeQC = [];
+  let priceQC = [];
+  let vendorQC = [];
+  let totalNumberOfPagesQC = 1;
+  let pageNumQC = 1;
+
+  // do {
+  //   $ = await fetchDataForQCfullProductListing();
+  //   // only need to do this once
+  //   if (pageNumBC == 1) {
+  //     totalNumberOfPagesQC = parseInt($('.pagination li:nth-last-child(2) a').text());
+  //   }
+  //   // go through each page
+  //   // go through each item on each page
+  //     // get get url for each item
+  //     // put url into array
+  //   // fetch product
+  //   pageNumQC++;
+  //   await sleep(getRandomInt(3000, 8000));
+  // } while (totalNumberOfPagesQC > pageNumQC);
+
+  ///////////////////////////////
+  //
+  // FULL LISTING FROM quebec ABOVE
+  //
+  ///////////////////////////////
+
   ///////////////////////////////
   //
   // FULL LISTING FROM bccannabisstores BELOW
   //
   ///////////////////////////////
-  // reset pageNum variable
   let productArrayBC = [];
   let productTitleBC = [];
   let plantTypeBC = [];
@@ -67,8 +115,9 @@ const getResults = async () => {
   let pageNumBC = 1;
 
   // do statement is for the page iterator
+  console.log('BC stuff')
   do {
-    $ = await fetchDataForBCfullProductListing();
+    $ = await fetchDataForBCfullProductListing(pageNumBC);
     // only need to do this once
     if (pageNumBC == 1) {
       totalNumberOfPagesBC = parseInt($('.pagination--inner li:nth-last-child(2) a').text());
@@ -114,6 +163,7 @@ const getResults = async () => {
   //
   ///////////////////////////////
   // best sellers stuff
+  console.log('OCS')
   let bestSellersVendorOCS = [];
   let bestSellersTitleOCS = [];
   let bestSellersPlantTypeOCS = [];
@@ -178,6 +228,7 @@ const getResults = async () => {
   let totalNumberOfPagesOCS = 1;
   let productArrayOCS = [];
   let pageNumOCS = 1;
+  let rankOCS = [];
 
   do {
     $ = await fetchDataForOCSfullProductListings(pageNumOCS);
@@ -209,6 +260,7 @@ const getResults = async () => {
     // grab price
     $('.product-tile__price').each((index, element) => {
       priceOCS.push($(element).text());
+      rankOCS.push(pageNumOCS, '.', index + 1)
     });
     pageNumOCS ++;
     // Convert to an array so that we can sort the results.
@@ -222,6 +274,7 @@ const getResults = async () => {
         thcRange: [...thcRangeOCS],
         cbdRange: [...cbdRangeOCS],
         price: [...priceOCS],
+        rank: [...rankOCS],
         date
       });
     }
@@ -239,6 +292,7 @@ const getResults = async () => {
   //
   ////////////////////////////////////////
   // send data to DB
+  console.log('here 292')
   pageRefOCS.set(productArrayOCS);
   pageRefBestSellersOCS.set(bestSellersArrayOCS);
   pageRefBC.set(productArrayBC);
@@ -247,6 +301,7 @@ const getResults = async () => {
   //  SEND DATA SETS TO FIREBASE ABOVE
   //
   ////////////////////////////////////////
+  console.log('done on ', date);
   return;
 };
 
