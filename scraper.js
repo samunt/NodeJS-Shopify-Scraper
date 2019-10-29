@@ -5,37 +5,26 @@ const date = new Date();
 // $ is used for promises returned from url fetch
 let $;
 
-// const fetchDataForQCfullProductList = async (pageNumQC) => {
-//   let url = "https://www.sqdc.ca/en-CA/Search?keywords=*&sortDirection=asc&page=" + pageNumQC;
-//   const result = await axios.get(url);
-//   return cheero.load(result.data);
-// };
-//
 // const fetchIndividualProductDataForQC = async (productURL) => {
 //   let url = productURL;
 //   const result = await axios.get(url);
 //   return cheerio.load(result.data);
 // };
 
-const fetchDataForBCfullProductListing = async (pageNumBC) => {
-  let url = "https://www.bccannabisstores.com/collections/cannabis-products?page=" + pageNumBC + "&grid_list=grid-view";
+const fetchDataFromExternalAPI = async (pageNum, province, type) => {
+  let url;
+  if (province === 'ON' && type === 'fullListing') {
+    url = "https://ocs.ca/collections/all-cannabis-products?&page=" + pageNum;
+  } else if (province === 'ON' && type === 'bestSellers') {
+    url = "https://ocs.ca";
+  } else if (province === 'BC' && type === null) {
+    url = "https://www.bccannabisstores.com/collections/cannabis-products?page=" + pageNum + "&grid_list=grid-view";
+  } else if (province === 'QC' && type === 'fullListing') {
+    url = "https://www.sqdc.ca/en-CA/Search?keywords=*&sortDirection=asc&page=" + pageNum;
+  };
   const result = await axios.get(url);
   return cheerio.load(result.data);
-};
-
-// called by getResults()
-const fetchDataForOCSfullProductListings = async (pageNumOCS) => {
-  let url = "https://ocs.ca/collections/all-cannabis-products?&page=" + pageNumOCS;
-  const result = await axios.get(url);
-  return cheerio.load(result.data);
-};
-
-// called by getResults()
-const fetchDataForOCSbestSellers = async () => {
-  let url = "https://ocs.ca";
-  const result = await axios.get(url);
-  return cheerio.load(result.data);
-};
+}
 
 // sleep function so we don't make requests to quickly
 function sleep(ms){
@@ -117,7 +106,7 @@ const getResults = async () => {
   // do statement is for the page iterator
   console.log('BC stuff')
   do {
-    $ = await fetchDataForBCfullProductListing(pageNumBC);
+    $ = await fetchDataFromExternalAPI(pageNumBC, 'BC', null);
     // only need to do this once
     if (pageNumBC == 1) {
       totalNumberOfPagesBC = parseInt($('.pagination--inner li:nth-last-child(2) a').text());
@@ -172,7 +161,7 @@ const getResults = async () => {
   let bestSellersPriceOCS = [];
   let bestSellersArrayOCS = [];
   $ = undefined;
-  $ = await fetchDataForOCSbestSellers();
+  $ = await fetchDataFromExternalAPI(null, 'ON', 'bestSellers');
   // grab vendor
   $('.product-carousel__products article h4').each((index, element) => {
     if (index === 0 || index % 3 === 0) {
@@ -231,7 +220,7 @@ const getResults = async () => {
   let rankOCS = [];
 
   do {
-    $ = await fetchDataForOCSfullProductListings(pageNumOCS);
+    $ = await fetchDataFromExternalAPI(pageNumOCS, 'ON', 'fullListing');
     // first check how many total pages there are - only need to do once
     if (pageNumOCS === 1) {
       totalNumberOfPagesOCS = parseInt($('.pagination li:nth-last-child(2)').text());

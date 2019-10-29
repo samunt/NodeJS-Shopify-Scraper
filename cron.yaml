@@ -2,4 +2,4 @@ version: 1
 cron: 
   - name: "task1"
     url: "/scheduled"
-    schedule: "* * * * *"
+    schedule: "0 */12 * * *"
