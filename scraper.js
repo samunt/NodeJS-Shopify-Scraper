@@ -296,12 +296,10 @@ const getResults = async () => {
   //
   ////////////////////////////////////////
   // send data to DB
-  console.log('TEMPORARILY TURNED OFF SENDING DATA TO FIREBASE');
-  // pageRefOCS.set(productArrayOCS);
-  // console.log('301');
-  // pageRefBestSellersOCS.set(bestSellersArrayOCS);
-  // console.log('303');
-  // pageRefBC.set(productArrayBC);
+  // console.log('TEMPORARILY TURNED OFF SENDING DATA TO FIREBASE');
+  pageRefOCS.set(productArrayOCS);
+  pageRefBestSellersOCS.set(bestSellersArrayOCS);
+  pageRefBC.set(productArrayBC);
   console.log('305');
   ////////////////////////////////////////
   //
@@ -314,7 +312,7 @@ const getResults = async () => {
     el: "OCSfullListing",
     productArrayOCS
   };
-  console.log('params');
+  console.log('params', params);
   // OCSfullListing: productArrayOCS,
   //     OCSbestSellers: bestSellersArrayOCS,
   //     BCfullListing: productArrayBC
