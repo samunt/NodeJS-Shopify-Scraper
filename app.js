@@ -16,6 +16,8 @@ admin.initializeApp({
   databaseURL: "https://on-scrape.firebaseio.com"
 });
 
+
+
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -36,6 +38,10 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+app.post('/schedule', function (req, res) {
+  res.writeHead(200, 'OK', {'Content-Type': 'text/plain'});
 });
 
 // self executing func to trigger the scraper

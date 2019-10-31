@@ -1,6 +1,8 @@
 const cheerio = require("cheerio");
 const axios = require("axios");
 const admin = require("firebase-admin");
+const ua = require('universal-analytics');
+const visitor = ua('UA-150484895-2');
 const date = new Date();
 // $ is used for promises returned from url fetch
 let $;
@@ -93,6 +95,7 @@ const getResults = async () => {
   // FULL LISTING FROM bccannabisstores BELOW
   //
   ///////////////////////////////
+  console.log('start bc');
   let productArrayBC = [];
   let productTitleBC = [];
   let plantTypeBC = [];
@@ -102,6 +105,7 @@ const getResults = async () => {
   let vendorBC = [];
   let totalNumberOfPagesBC = 1;
   let pageNumBC = 1;
+  let imgLinkBC = [];
 
   // do statement is for the page iterator
   console.log('BC stuff')
@@ -127,6 +131,9 @@ const getResults = async () => {
       cbdRangeBC.push($(element).text());
       plantTypeBC.push('Not Available')
     });
+    $('.productitem--image-link img').each((index, element) => {
+      imgLinkBC.push($(element).attr('src'));
+    });
     pageNumBC++;
     await sleep(getRandomInt(3000, 8000));
   } while (totalNumberOfPagesBC > pageNumBC);
@@ -140,7 +147,7 @@ const getResults = async () => {
     price: [...priceBC],
     date
   });
-  ///////////////////////////////
+  ///////////////////////////////////////
   //
   // FULL LISTING FROM bccannabisstores ABOVE
   //
@@ -152,7 +159,7 @@ const getResults = async () => {
   //
   ///////////////////////////////
   // best sellers stuff
-  console.log('OCS')
+  console.log('start ocs best sellers');
   let bestSellersVendorOCS = [];
   let bestSellersTitleOCS = [];
   let bestSellersPlantTypeOCS = [];
@@ -205,9 +212,10 @@ const getResults = async () => {
 
   ////////////////////////////////////////
   //
-  //  FULL PRODUCT LISTING FROM OCS BELOW
+  //  FULL LISTING FROM OCS BELOW
   //
   ////////////////////////////////////////
+  console.log('start ocs full listing');
   let vendorOCS = [];
   let productTitleOCS = [];
   let plantTypeOCS = [];
@@ -217,7 +225,7 @@ const getResults = async () => {
   let totalNumberOfPagesOCS = 1;
   let productArrayOCS = [];
   let pageNumOCS = 1;
-  let rankOCS = [];
+  let imageLinkOCS = [];
 
   do {
     $ = await fetchDataFromExternalAPI(pageNumOCS, 'ON', 'fullListing');
@@ -249,13 +257,20 @@ const getResults = async () => {
     // grab price
     $('.product-tile__price').each((index, element) => {
       priceOCS.push($(element).text());
-      rankOCS.push(pageNumOCS, '.', index + 1)
     });
+    //grab image url
+    $('.product-tile__image img').each((index, element) => {
+      imageLinkOCS.push($(element).attr('src'));
+    });
+    console.log(pageNumOCS);
+    console.log('total num', totalNumberOfPagesOCS - 1)
     pageNumOCS ++;
     // Convert to an array so that we can sort the results.
     // we need the IF because when you click to go to the next page, it just appends the product list with new data
     // so that means that the last page will have all the data, only if we went thru the pages from 1 .. n, one at a time
-    if (totalNumberOfPagesOCS == pageNumOCS) {
+    const total = totalNumberOfPagesOCS - 1;
+    console.log('total', total);
+    if (total == pageNumOCS) {
       productArrayOCS.push ({
         vendors: [...vendorOCS],
         productTitle: [...productTitleOCS],
@@ -263,7 +278,7 @@ const getResults = async () => {
         thcRange: [...thcRangeOCS],
         cbdRange: [...cbdRangeOCS],
         price: [...priceOCS],
-        rank: [...rankOCS],
+        image: [...imageLinkOCS],
         date
       });
     }
@@ -281,16 +296,32 @@ const getResults = async () => {
   //
   ////////////////////////////////////////
   // send data to DB
-  console.log('here 292')
-  pageRefOCS.set(productArrayOCS);
-  pageRefBestSellersOCS.set(bestSellersArrayOCS);
-  pageRefBC.set(productArrayBC);
+  console.log('TEMPORARILY TURNED OFF SENDING DATA TO FIREBASE');
+  // pageRefOCS.set(productArrayOCS);
+  // console.log('301');
+  // pageRefBestSellersOCS.set(bestSellersArrayOCS);
+  // console.log('303');
+  // pageRefBC.set(productArrayBC);
+  console.log('305');
   ////////////////////////////////////////
   //
   //  SEND DATA SETS TO FIREBASE ABOVE
   //
   ////////////////////////////////////////
-  console.log('done on ', date);
+  const params = {
+    ec: "Provincial Store Full Listing",
+    ea: "Scrape",
+    el: "OCSfullListing",
+    productArrayOCS
+  };
+  console.log('params');
+  // OCSfullListing: productArrayOCS,
+  //     OCSbestSellers: bestSellersArrayOCS,
+  //     BCfullListing: productArrayBC
+
+  visitor.event(params).send();
+  console.log('send');
+
   return;
 };
 
