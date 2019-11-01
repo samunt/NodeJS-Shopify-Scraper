@@ -27,9 +27,9 @@ pipelines:
         - echo "Deployment!"
         - pipe: atlassian/aws-elasticbeanstalk-deploy:0.2.3
           variables:
-            AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-            AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-            AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION
+            AWS_ACCESS_KEY_ID: AKIAXRTRQOS3JGXVTZRH
+            AWS_SECRET_ACCESS_KEY: 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
+            AWS_DEFAULT_REGION: us-east-2
             APPLICATION_NAME: 'on-scrap'
             COMMAND: 'deploy-only'
             VERSION_LABEL: 'deploy-$BITBUCKET_BUILD_NUMBER-multiple'
