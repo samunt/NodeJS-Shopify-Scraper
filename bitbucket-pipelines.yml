@@ -8,8 +8,8 @@ pipelines:
           - zip -r app.zip node_modules bin *.js *.json 
           - pipe: atlassian/aws-elasticbeanstalk-deploy:0.2.3
             variables:
-              AWS_ACCESS_KEY_ID: 518855357622
-              AWS_SECRET_ACCESS_KEY: AKIAIC3TYV2OXKLKUDWA
+              AWS_ACCESS_KEY_ID: AKIAXRTRQOS3JGXVTZRH
+              AWS_SECRET_ACCESS_KEY: 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
               AWS_DEFAULT_REGION: us-east-2
               APPLICATION_NAME: 'on-scrap'
               COMMAND: 'upload-only'
