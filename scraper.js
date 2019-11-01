@@ -95,7 +95,7 @@ const getResults = async () => {
   // FULL LISTING FROM bccannabisstores BELOW
   //
   ///////////////////////////////
-  console.log('start bc');
+  // console.log('start bc');
   let productArrayBC = [];
   let productTitleBC = [];
   let plantTypeBC = [];
@@ -108,7 +108,7 @@ const getResults = async () => {
   let imgLinkBC = [];
 
   // do statement is for the page iterator
-  console.log('BC stuff')
+  // console.log('BC stuff')
   do {
     $ = await fetchDataFromExternalAPI(pageNumBC, 'BC', null);
     // only need to do this once
@@ -159,7 +159,7 @@ const getResults = async () => {
   //
   ///////////////////////////////
   // best sellers stuff
-  console.log('start ocs best sellers');
+  // console.log('start ocs best sellers');
   let bestSellersVendorOCS = [];
   let bestSellersTitleOCS = [];
   let bestSellersPlantTypeOCS = [];
@@ -215,7 +215,7 @@ const getResults = async () => {
   //  FULL LISTING FROM OCS BELOW
   //
   ////////////////////////////////////////
-  console.log('start ocs full listing');
+  // console.log('start ocs full listing');
   let vendorOCS = [];
   let productTitleOCS = [];
   let plantTypeOCS = [];
@@ -262,14 +262,14 @@ const getResults = async () => {
     $('.product-tile__image img').each((index, element) => {
       imageLinkOCS.push($(element).attr('src'));
     });
-    console.log(pageNumOCS);
-    console.log('total num', totalNumberOfPagesOCS - 1)
+    // console.log(pageNumOCS);
+    // console.log('total num', totalNumberOfPagesOCS - 1)
     pageNumOCS ++;
     // Convert to an array so that we can sort the results.
     // we need the IF because when you click to go to the next page, it just appends the product list with new data
     // so that means that the last page will have all the data, only if we went thru the pages from 1 .. n, one at a time
     const total = totalNumberOfPagesOCS - 1;
-    console.log('total', total);
+    // console.log('total', total);
     if (total == pageNumOCS) {
       productArrayOCS.push ({
         vendors: [...vendorOCS],
@@ -300,7 +300,7 @@ const getResults = async () => {
   pageRefOCS.set(productArrayOCS);
   pageRefBestSellersOCS.set(bestSellersArrayOCS);
   pageRefBC.set(productArrayBC);
-  console.log('305');
+  // console.log('305');
   ////////////////////////////////////////
   //
   //  SEND DATA SETS TO FIREBASE ABOVE
@@ -312,13 +312,13 @@ const getResults = async () => {
     el: "OCSfullListing",
     productArrayOCS
   };
-  console.log('params', params);
+  // console.log('params', params);
   // OCSfullListing: productArrayOCS,
   //     OCSbestSellers: bestSellersArrayOCS,
   //     BCfullListing: productArrayBC
 
   visitor.event(params).send();
-  console.log('send');
+  // console.log('send');
 
   return;
 };
