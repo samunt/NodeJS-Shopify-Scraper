@@ -51,10 +51,10 @@ const getResults = async () => {
   let ref = db.ref("scrapedPages/");
   let dateToString = date.toString();
   // prep db references by adding a timestamp
-  let pageRefBestSellersOCS = ref.child('OCS-best-sellers-on-' + dateToString);
-  let pageRefOCS = ref.child('OCS-full-product-listing-scrape-on-' + dateToString);
-  let pageRefBC = ref.child('BC-full-product-listing-scrape-on-' + dateToString);
-  let pageRefQC = ref.child('QC-full-product-listing-scrape-on-' + dateToString);
+  let pageRefBestSellersOCS = ref.child('OCS-best-sellers');
+  let pageRefOCS = ref.child('OCS-full-product-listing-scrape');
+  let pageRefBC = ref.child('BC-full-product-listing-scrape');
+  let pageRefQC = ref.child('QC-full-product-listing-scrape');
   if (shouldRunScraper === true) { //
     ///////////////////////////////
     //
