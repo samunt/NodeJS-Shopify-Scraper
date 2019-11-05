@@ -14,6 +14,14 @@ let $;
 //   return cheerio.load(result.data);
 // };
 
+function guid() {
+  function _p8(s) {
+    let p = (Math.random().toString(16)+"000000000").substr(2,8);
+    return s ? "-" + p.substr(0,4) + "-" + p.substr(4,4) : p ;
+  }
+  return _p8() + _p8(true) + _p8(true) + _p8();
+}
+
 const fetchDataFromExternalAPI = async (pageNum, province, type) => {
   let url;
   if (province === 'ON' && type === 'fullListing') {
@@ -24,10 +32,10 @@ const fetchDataFromExternalAPI = async (pageNum, province, type) => {
     url = "https://www.bccannabisstores.com/collections/cannabis-products?page=" + pageNum + "&grid_list=grid-view";
   } else if (province === 'QC' && type === 'fullListing') {
     url = "https://www.sqdc.ca/en-CA/Search?keywords=*&sortDirection=asc&page=" + pageNum;
-  };
+  }
   const result = await axios.get(url);
   return cheerio.load(result.data);
-}
+};
 
 // sleep function so we don't make requests to quickly
 function sleep(ms){
@@ -48,13 +56,14 @@ const getResults = async () => {
   // Get a database reference to our blog
   let db = admin.database();
   // create db path reference
-  let ref = db.ref("scrapedPages/");
+  let refOCSfull = db.ref("OCSfull/0");
+  let refOCSbestSellers = db.ref("OCSbestSellers/0");
+  let refBCfull = db.ref("BCfull/0");
   let dateToString = date.toString();
   // prep db references by adding a timestamp
-  let pageRefBestSellersOCS = ref.child('OCS-best-sellers');
-  let pageRefOCS = ref.child('OCS-full-product-listing-scrape');
-  let pageRefBC = ref.child('BC-full-product-listing-scrape');
-  let pageRefQC = ref.child('QC-full-product-listing-scrape');
+  let pageRefBestSellersOCS = refOCSbestSellers.child(guid());
+  let pageRefOCS = refOCSfull.child(guid());
+  let pageRefBC = refBCfull.child(guid());
   if (shouldRunScraper === true) { //
     ///////////////////////////////
     //
@@ -111,6 +120,7 @@ const getResults = async () => {
 
     // do statement is for the page iterator
     // console.log('BC stuff')
+    console.log('1')
     do {
       $ = await fetchDataFromExternalAPI(pageNumBC, 'BC', 'fullListing');
       // only need to do this once
@@ -139,16 +149,16 @@ const getResults = async () => {
       pageNumBC++;
       await sleep(getRandomInt(3000, 8000));
     } while (totalNumberOfPagesBC > pageNumBC);
-
-    productArrayBC.push({
+    const dbBCparams = {
+      date: new Date().toDateString(),
       vendors: [...vendorBC],
       productTitle: [...productTitleBC],
       plantType: [...plantTypeBC],
       thcRange: [...thcRangeBC],
       cbdRange: [...cbdRangeBC],
-      price: [...priceBC],
-      date
-    });
+      price: [...priceBC]
+    };
+    productArrayBC.push(dbBCparams);
     ///////////////////////////////////////
     //
     // FULL LISTING FROM bccannabisstores ABOVE
@@ -161,7 +171,7 @@ const getResults = async () => {
     //
     ///////////////////////////////
     // best sellers stuff
-    // console.log('start ocs best sellers');
+    console.log('start ocs best sellers');
     let bestSellersVendorOCS = [];
     let bestSellersTitleOCS = [];
     let bestSellersPlantTypeOCS = [];
@@ -196,16 +206,17 @@ const getResults = async () => {
     $('.product-carousel__products .product-tile__info .product-tile__price').each((index, element) => {
       bestSellersPriceOCS.push($(element).text());
     });
-
-    bestSellersArrayOCS.push({
+    const dbParams = {
+      date: new Date().toDateString(),
       vendors: [...bestSellersVendorOCS],
       productTitle: [...bestSellersTitleOCS],
       plantType: [...bestSellersPlantTypeOCS],
       thcRange: [...bestSellersTHCrangeOCS],
       cbdRange: [...bestSellersCBDrangeOCS],
-      price: [...bestSellersPriceOCS],
-      date
-    });
+      price: [...bestSellersPriceOCS]
+    };
+    bestSellersArrayOCS.push(dbParams);
+
     ////////////////////////////////////////
     //
     //  BEST SELLERS FROM OCS ABOVE
@@ -264,25 +275,24 @@ const getResults = async () => {
       $('.product-tile__image img').each((index, element) => {
         imageLinkOCS.push($(element).attr('src'));
       });
-      // console.log(pageNumOCS);
-      // console.log('total num', totalNumberOfPagesOCS - 1)
       pageNumOCS++;
       // Convert to an array so that we can sort the results.
       // we need the IF because when you click to go to the next page, it just appends the product list with new data
       // so that means that the last page will have all the data, only if we went thru the pages from 1 .. n, one at a time
       const total = totalNumberOfPagesOCS - 1;
-      // console.log('total', total);
       if (total == pageNumOCS) {
-        productArrayOCS.push({
+        const dbOCSfullParams = {
+          date: 'date',
           vendors: [...vendorOCS],
           productTitle: [...productTitleOCS],
           plantType: [...plantTypeOCS],
           thcRange: [...thcRangeOCS],
           cbdRange: [...cbdRangeOCS],
           price: [...priceOCS],
-          image: [...imageLinkOCS],
-          date
-        });
+          image: [...imageLinkOCS]
+        };
+        productArrayOCS.push(dbOCSfullParams);
+        console.log('4')
       }
       await sleep(getRandomInt(3000, 8000));
     } while (totalNumberOfPagesOCS > pageNumOCS);
@@ -298,11 +308,10 @@ const getResults = async () => {
     //
     ////////////////////////////////////////
     // send data to DB
-    // console.log('TEMPORARILY TURNED OFF SENDING DATA TO FIREBASE');
+    console.log('here')
     pageRefOCS.set(productArrayOCS);
     pageRefBestSellersOCS.set(bestSellersArrayOCS);
     pageRefBC.set(productArrayBC);
-    // console.log('305');
     ////////////////////////////////////////
     //
     //  SEND DATA SETS TO FIREBASE ABOVE
@@ -314,41 +323,8 @@ const getResults = async () => {
       el: "OCSfullListing",
       productArrayOCS
     };
-    // console.log('params', params);
-    // OCSfullListing: productArrayOCS,
-    //     OCSbestSellers: bestSellersArrayOCS,
-    //     BCfullListing: productArrayBC
-
-    visitor.event(params).send();
-    // console.log('send');
   } else {
-    ref.on("value", function(snapshot) {
-      // console.log(snapshot.val());
-      // scrapehash is an object that is a key-value pair ex.  OCS-full-scrape : [ { cbdRange : [...ranges], thcRange : [...ranges] }
-      let scrapeHashVal = snapshot.val();
-
-      const hasNewlineString = scrapeHashVal[0].match(/\\r?\\n|\\r/g) ? true : false;
-
-      if (hasNewlineString) {
-        scrapeHashVal.match(/\\r?\\n|\\r/g).replace('');
-        scrapeHashVal.trimStart();
-        scrapeHashVal.trimEnd();
-        // console.log(scrapeHashVal);
-      }
-      return;
-    }, function (errorObject) {
-      console.log("The read failed: " + errorObject.code);
-    });
-    // let db = admin.database();
-    // // create db path reference
-    // let ref = db.ref("scrapedPages/");
-    // let dateToString = date.toString();
-    // // prep db references by adding a timestamp
-    // let pageRefBestSellersOCS = ref.child('OCS-best-sellers-on-' + dateToString);
-    // let pageRefOCS = ref.child('OCS-full-product-listing-scrape-on-' + dateToString);
-    // let pageRefBC = ref.child('BC-full-product-listing-scrape-on-' + dateToString);
-    // let pageRefQC = ref.child('QC-full-product-listing-scrape-on-' + dateToString);
-
+    return;
   };
   return;
 };

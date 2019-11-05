@@ -13,7 +13,7 @@ let serviceAccount = require("./on-scrape-firebase-adminsdk-qhq3k-e963c283df.jso
 // initialize firebase
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://on-scrape.firebaseio.com"
+  databaseURL: "https://single-cistern-137723.firebaseio.com/"
 });
 
 
