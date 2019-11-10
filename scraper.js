@@ -3,6 +3,7 @@ const axios = require("axios");
 const admin = require("firebase-admin");
 const ua = require('universal-analytics');
 const visitor = ua('UA-150484895-2');
+const moment = require('moment');
 const date = new Date();
 const shouldRunScraper = true;
 // $ is used for promises returned from url fetch
@@ -14,6 +15,7 @@ let $;
 //   return cheerio.load(result.data);
 // };
 
+// create a GUID so we can have unique record names
 function guid() {
   function _p8(s) {
     let p = (Math.random().toString(16)+"000000000").substr(2,8);
@@ -37,9 +39,9 @@ const fetchDataFromExternalAPI = async (pageNum, province, type) => {
   return cheerio.load(result.data);
 };
 
-// sleep function so we don't make requests to quickly
+// sleep function so we don't make requests too quickly and get the IP blacklisted
 function sleep(ms){
-  return new Promise(resolve=>{
+  return new Promise(resolve => {
     setTimeout(resolve,ms)
   })
 }
@@ -122,10 +124,12 @@ const getResults = async () => {
     // console.log('BC stuff')
     console.log('1')
     do {
+      console.log('before')
       $ = await fetchDataFromExternalAPI(pageNumBC, 'BC', 'fullListing');
       // only need to do this once
       if (pageNumBC == 1) {
         totalNumberOfPagesBC = parseInt($('.pagination--inner li:nth-last-child(2) a').text());
+        console.log('page bc', totalNumberOfPagesBC);
       }
       $('.productitem--title a span').each((index, element) => {
         productTitleBC.push($(element).text());
@@ -239,14 +243,20 @@ const getResults = async () => {
     let productArrayOCS = [];
     let pageNumOCS = 1;
     let imageLinkOCS = [];
+    let inStockOCS = [];
 
     do {
       $ = await fetchDataFromExternalAPI(pageNumOCS, 'ON', 'fullListing');
       // first check how many total pages there are - only need to do once
       if (pageNumOCS === 1) {
         totalNumberOfPagesOCS = parseInt($('.pagination li:nth-last-child(2)').text());
+        console.log('total number of pages', totalNumberOfPagesOCS);
       }
       // use fetched data to grab elements (and their text) and push into arrays defined above
+      // is in stock?
+      $('.notice--stock').each((index, element) => {
+        $(element).hasChildren() ? inStockOCS.push(false) : inStockOCS.push(true);
+      });
       // get vendor
       $('.product-tile__vendor').each((index, element) => {
         vendorOCS.push($(element).text());
@@ -276,20 +286,22 @@ const getResults = async () => {
         imageLinkOCS.push($(element).attr('src'));
       });
       pageNumOCS++;
+      console.log(pageNumOCS);
       // Convert to an array so that we can sort the results.
       // we need the IF because when you click to go to the next page, it just appends the product list with new data
       // so that means that the last page will have all the data, only if we went thru the pages from 1 .. n, one at a time
       const total = totalNumberOfPagesOCS - 1;
       if (total == pageNumOCS) {
         const dbOCSfullParams = {
-          date: 'date',
+          date: new Date().toDateString(),
           vendors: [...vendorOCS],
           productTitle: [...productTitleOCS],
           plantType: [...plantTypeOCS],
           thcRange: [...thcRangeOCS],
           cbdRange: [...cbdRangeOCS],
           price: [...priceOCS],
-          image: [...imageLinkOCS]
+          image: [...imageLinkOCS],
+          inStock: [...inStockOCS]
         };
         productArrayOCS.push(dbOCSfullParams);
         console.log('4')
@@ -312,6 +324,7 @@ const getResults = async () => {
     pageRefOCS.set(productArrayOCS);
     pageRefBestSellersOCS.set(bestSellersArrayOCS);
     pageRefBC.set(productArrayBC);
+    console.log('here2')
     ////////////////////////////////////////
     //
     //  SEND DATA SETS TO FIREBASE ABOVE
@@ -324,6 +337,34 @@ const getResults = async () => {
       productArrayOCS
     };
   } else {
+
+    // OCSfull.0.{{GUID}}.0.date
+    let rawArray = [];
+    refOCSfull.on("value", function(snapshot) {
+      rawArray.push(snapshot.val())
+      // rawArray[0][Object.keys(rawArray[0])[0]] is the way to access the first data GUID as our data is in the first property value in the obj returned from firebase
+      let singleDayScrape = rawArray[0][Object.keys(rawArray[0])[0]];
+      let fullCategoryScrape = [];
+      console.log('before for')
+      for (let i = 0; i < 50; i++) {
+        console.log('in for')
+        if (rawArray[0][Object.keys(rawArray[0])[i]]) {
+          console.log('in if');
+          fullCategoryScrape.push(rawArray[0][Object.keys(rawArray[0])[i]]);
+        } else {
+          console.log('complete');
+        }
+      }
+      // console.log(fullCategoryScrape)
+      const sortedByDateFullCategory = fullCategoryScrape.sort(function(a,b){
+        // Turn your strings into dates, and then subtract them
+        // to get a value that is either negative, positive, or zero.
+        return new moment(b.date) - new moment(a.date);
+      });
+      console.log(sortedByDateFullCategory);
+    }, function (errorObject) {
+      console.log("The read failed: " + errorObject.code);
+    });
     return;
   };
   return;
