@@ -15,15 +15,6 @@ let $;
 //   return cheerio.load(result.data);
 // };
 
-// create a GUID so we can have unique record names
-function guid() {
-  function _p8(s) {
-    let p = (Math.random().toString(16)+"000000000").substr(2,8);
-    return s ? "-" + p.substr(0,4) + "-" + p.substr(4,4) : p ;
-  }
-  return _p8() + _p8(true) + _p8(true) + _p8();
-}
-
 const fetchDataFromExternalAPI = async (pageNum, province, type) => {
   let url;
   if (province === 'ON' && type === 'fullListing') {
@@ -39,20 +30,6 @@ const fetchDataFromExternalAPI = async (pageNum, province, type) => {
   return cheerio.load(result.data);
 };
 
-// sleep function so we don't make requests too quickly and get the IP blacklisted
-function sleep(ms){
-  return new Promise(resolve => {
-    setTimeout(resolve,ms)
-  })
-}
-
-// get random number for sleep timer
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 // this function is called first
 const getResults = async () => {
   // Get a database reference to our blog
@@ -62,10 +39,13 @@ const getResults = async () => {
   let refOCSbestSellers = db.ref("OCSbestSellers/0");
   let refBCfull = db.ref("BCfull/0");
   let dateToString = date.toString();
+  const Helper = require('./helperFunctions')
+  const HelperFunctions = new Helper(3000, 8000, null);
   // prep db references by adding a timestamp
-  let pageRefBestSellersOCS = refOCSbestSellers.child(guid());
-  let pageRefOCS = refOCSfull.child(guid());
-  let pageRefBC = refBCfull.child(guid());
+  console.log('guid', HelperFunctions.guid());
+  let pageRefBestSellersOCS = refOCSbestSellers.child(HelperFunctions.guid());
+  let pageRefOCS = refOCSfull.child(HelperFunctions.guid());
+  let pageRefBC = refBCfull.child(HelperFunctions.guid());
   if (shouldRunScraper === true) { //
     ///////////////////////////////
     //
@@ -122,14 +102,14 @@ const getResults = async () => {
 
     // do statement is for the page iterator
     // console.log('BC stuff')
-    console.log('1')
+    // console.log('1')
     do {
-      console.log('before')
+      // console.log('before')
       $ = await fetchDataFromExternalAPI(pageNumBC, 'BC', 'fullListing');
       // only need to do this once
       if (pageNumBC == 1) {
         totalNumberOfPagesBC = parseInt($('.pagination--inner li:nth-last-child(2) a').text());
-        console.log('page bc', totalNumberOfPagesBC);
+        // console.log('page bc', totalNumberOfPagesBC);
       }
       $('.productitem--title a span').each((index, element) => {
         productTitleBC.push($(element).text());
@@ -151,7 +131,10 @@ const getResults = async () => {
         imgLinkBC.push($(element).attr('src'));
       });
       pageNumBC++;
-      await sleep(getRandomInt(3000, 8000));
+      const val = HelperFunctions.getRandomInt();
+      const HelperSleep1 = new Helper(null, null, val)
+      await HelperSleep1.sleep(val);
+      console.log('random', HelperFunctions.getRandomInt())
     } while (totalNumberOfPagesBC > pageNumBC);
     const dbBCparams = {
       date: new Date().toDateString(),
@@ -175,7 +158,7 @@ const getResults = async () => {
     //
     ///////////////////////////////
     // best sellers stuff
-    console.log('start ocs best sellers');
+    // console.log('start ocs best sellers');
     let bestSellersVendorOCS = [];
     let bestSellersTitleOCS = [];
     let bestSellersPlantTypeOCS = [];
@@ -250,7 +233,7 @@ const getResults = async () => {
       // first check how many total pages there are - only need to do once
       if (pageNumOCS === 1) {
         totalNumberOfPagesOCS = parseInt($('.pagination li:nth-last-child(2)').text());
-        console.log('total number of pages', totalNumberOfPagesOCS);
+        // console.log('total number of pages', totalNumberOfPagesOCS);
       }
       // use fetched data to grab elements (and their text) and push into arrays defined above
       // is in stock?
@@ -304,9 +287,11 @@ const getResults = async () => {
           inStock: [...inStockOCS]
         };
         productArrayOCS.push(dbOCSfullParams);
-        console.log('4')
+        // console.log('4')
       }
-      await sleep(getRandomInt(3000, 8000));
+      const val = HelperFunctions.getRandomInt();
+      const HelperSleep2 = new Helper(null, null, val)
+      await HelperSleep2.sleep();
     } while (totalNumberOfPagesOCS > pageNumOCS);
     ////////////////////////////////////////
     //
@@ -320,11 +305,11 @@ const getResults = async () => {
     //
     ////////////////////////////////////////
     // send data to DB
-    console.log('here')
+    // console.log('here')
     pageRefOCS.set(productArrayOCS);
     pageRefBestSellersOCS.set(bestSellersArrayOCS);
     pageRefBC.set(productArrayBC);
-    console.log('here2')
+    // console.log('here2')
     ////////////////////////////////////////
     //
     //  SEND DATA SETS TO FIREBASE ABOVE
@@ -345,25 +330,21 @@ const getResults = async () => {
       // rawArray[0][Object.keys(rawArray[0])[0]] is the way to access the first data GUID as our data is in the first property value in the obj returned from firebase
       let singleDayScrape = rawArray[0][Object.keys(rawArray[0])[0]];
       let fullCategoryScrape = [];
-      console.log('before for')
-      for (let i = 0; i < 50; i++) {
-        console.log('in for')
-        if (rawArray[0][Object.keys(rawArray[0])[i]]) {
-          console.log('in if');
-          fullCategoryScrape.push(rawArray[0][Object.keys(rawArray[0])[i]]);
-        } else {
-          console.log('complete');
+      // go through all records - n is arbitrary for the last year
+      const rawArrFirstVal = rawArray[0]
+      const numOfRecordsOnBranch = Object.keys(rawArrFirstVal).length;
+      for (let i = 0; i < numOfRecordsOnBranch; i++) {
+        console.log(Object.keys(rawArrFirstVal)[i]);
+        if (Object.keys(rawArrFirstVal)[i].date !== 'date') {
+          fullCategoryScrape.push(rawArrFirstVal[Object.keys(rawArrFirstVal)[i]]);
         }
       }
-      // console.log(fullCategoryScrape)
-      const sortedByDateFullCategory = fullCategoryScrape.sort(function(a,b){
-        // Turn your strings into dates, and then subtract them
-        // to get a value that is either negative, positive, or zero.
-        return new moment(b.date) - new moment(a.date);
+      let sortedByDateFullCategory = fullCategoryScrape.sort(function (left, right) {
+        return moment.utc(left.date).diff(moment.utc(right.date))
       });
-      console.log(sortedByDateFullCategory);
+      // console.log('sorted',sortedByDateFullCategory);
     }, function (errorObject) {
-      console.log("The read failed: " + errorObject.code);
+      // console.log("The read failed: " + errorObject.code);
     });
     return;
   };
