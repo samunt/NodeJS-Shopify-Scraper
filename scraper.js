@@ -1,3 +1,11 @@
+// TODO
+// Write script to homogenize the strings, get rid of extra spaces, slashes, etc.
+// Write script to save an instance of the db to local machine so i dont waste so much money testing
+// Sort by date (need to figure out how the object really looks like when it comes from firebase.
+// k-NN -> figure out the model and data points we want to match
+//
+
+
 const cheerio = require("cheerio");
 const axios = require("axios");
 const admin = require("firebase-admin");
@@ -5,7 +13,7 @@ const ua = require('universal-analytics');
 const visitor = ua('UA-150484895-2');
 const moment = require('moment');
 const date = new Date();
-const shouldRunScraper = true;
+const shouldRunScraper = false;
 // $ is used for promises returned from url fetch
 let $;
 
@@ -25,7 +33,9 @@ const fetchDataFromExternalAPI = async (pageNum, province, type) => {
     url = "https://www.bccannabisstores.com/collections/cannabis-products?page=" + pageNum + "&grid_list=grid-view";
   } else if (province === 'QC' && type === 'fullListing') {
     url = "https://www.sqdc.ca/en-CA/Search?keywords=*&sortDirection=asc&page=" + pageNum;
-  }
+  } else if (type === 'individualPage') {
+
+  };
   const result = await axios.get(url);
   return cheerio.load(result.data);
 };
@@ -35,7 +45,7 @@ const getResults = async () => {
   // Get a database reference to our blog
   let db = admin.database();
   // create db path reference
-  let refOCSfull = db.ref("OCSfull/0");
+  let refOCSfull = db.ref("OCSfullVersion2/");
   let refOCSbestSellers = db.ref("OCSbestSellers/0");
   let refBCfull = db.ref("BCfull/0");
   let dateToString = date.toString();
@@ -216,6 +226,30 @@ const getResults = async () => {
     //
     ////////////////////////////////////////
     // console.log('start ocs full listing');
+    let genericProductModel = {
+      productType: null,
+      cbdRangeForBud: null ,
+      thcRangeForBud: null,
+      gramsOfBudPerUnit: null,
+      cbdMgPerMl: null,
+      thcMgPerMl: null,
+      grams: null,
+      pricePerGram: null,
+      inStock: null,
+      mlPerBottle: null,
+      capsulesPerBottle: null,
+      thcMgPerCapsule: null,
+      cbdMgPerCapsule: null,
+      date: null,
+      imageUrl: null,
+      plantType: null,
+      price: null,
+      mlPerUnit: null,
+      terpenes: [],
+      vendor: null,
+      productTitle: null
+    };
+
     let vendorOCS = [];
     let productTitleOCS = [];
     let plantTypeOCS = [];
@@ -227,68 +261,67 @@ const getResults = async () => {
     let pageNumOCS = 1;
     let imageLinkOCS = [];
     let inStockOCS = [];
+    let arrToHoldLinksOfPages = [];
 
     do {
+      //  1. go to ocs /all-cannabis products + pageNum
       $ = await fetchDataFromExternalAPI(pageNumOCS, 'ON', 'fullListing');
       // first check how many total pages there are - only need to do once
       if (pageNumOCS === 1) {
         totalNumberOfPagesOCS = parseInt($('.pagination li:nth-last-child(2)').text());
         // console.log('total number of pages', totalNumberOfPagesOCS);
       }
-      // use fetched data to grab elements (and their text) and push into arrays defined above
-      // is in stock?
-      $('.notice--stock').each((index, element) => {
-        $(element).hasChildren() ? inStockOCS.push(false) : inStockOCS.push(true);
+      //  2. get href of i of all the .product-tile__title of the page and put into array
+      $('.product-tile__info .product-tile__data a').each((index, element) => {
+        let link = $(value).attr('href');
+        arrToHoldLinksOfPages.push(link);
       });
-      // get vendor
-      $('.product-tile__vendor').each((index, element) => {
-        vendorOCS.push($(element).text());
-      });
-      // grab product title
-      $('.product-tile__title').each((index, element) => {
-        productTitleOCS.push($(element).text());
-      });
-      // grab plant type
-      $('.product-tile__plant-type').each((index, element) => {
-        plantTypeOCS.push($(element).text());
-      });
-      // grab thc range
-      $('.product-tile__properties  li:nth-child(2) p').each((index, element) => {
-        thcRangeOCS.push($(element).text());
-      });
-      // grab cbd range
-      $('.product-tile__properties  li:nth-child(3) p').each((index, element) => {
-        cbdRangeOCS.push($(element).text());
-      });
-      // grab price
-      $('.product-tile__price').each((index, element) => {
-        priceOCS.push($(element).text());
-      });
-      //grab image url
-      $('.product-tile__image img').each((index, element) => {
-        imageLinkOCS.push($(element).attr('src'));
-      });
-      pageNumOCS++;
-      console.log(pageNumOCS);
-      // Convert to an array so that we can sort the results.
-      // we need the IF because when you click to go to the next page, it just appends the product list with new data
-      // so that means that the last page will have all the data, only if we went thru the pages from 1 .. n, one at a time
-      const total = totalNumberOfPagesOCS - 1;
-      if (total == pageNumOCS) {
-        const dbOCSfullParams = {
-          date: new Date().toDateString(),
-          vendors: [...vendorOCS],
-          productTitle: [...productTitleOCS],
-          plantType: [...plantTypeOCS],
-          thcRange: [...thcRangeOCS],
-          cbdRange: [...cbdRangeOCS],
-          price: [...priceOCS],
-          image: [...imageLinkOCS],
-          inStock: [...inStockOCS]
+      //  3. while (i < i.length)
+      let counter = 0
+      do {
+        //  3.1. go to href of i like https://ocs.ca/products/napali-cbd-pre-roll-haven-st
+        $ = await fetchDataFromExternalAPI(null, null, 'individualPage');
+        // 3.2 fill up the model, and if the element doesn’t exist, add null.
+
+        // in stock
+        // check if pre roll
+        if ($('.product__title h2').text().includes('Pre-Roll')) {
+          genericProductModel.productType = 'Pre-Roll';
+          genericProductModel.productTitle = $('.product__title h2').text();
+          $('.notice .notice--stock .online-availability-wrapper h5 .notice__heading').text().includes('In stock') ?
+              genericProductModel.inStock = true : genericProductModel.inStock = false;
+          if ($('.swatches li label').hasAttribute('aria-describedby')) {
+            // needs to go in array
+            genericProductModel.gramsOfBudPerUnit = $
+          }
+        }
+
+
+        let genericProductModel = {
+          productType: null,
+          cdbRangeForBud: null ,
+          thcRangeForBud: null,
+          gramsOfBudPerUnit: null,
+          cbdMgPerMl: null,
+          thcMgPerMl: null,
+          grams: null,
+          pricePerGram: null,
+          inStock: null,
+          mlPerBottle: null,
+          capsulesPerBottle: null,
+          thcMgPerCapsule: null,
+          cbdMgPerCapsule: null,
+          date: null,
+          imageUrl: null,
+          plantType: null,
+          price: null,
+          mlPerUnit: null,
+          terpenes: [],
+          vendor: null,
+          productTitle: null
         };
-        productArrayOCS.push(dbOCSfullParams);
-        // console.log('4')
-      }
+        counter++;
+      } while (counter < arrToHoldLinksOfPages.length);
       const val = HelperFunctions.getRandomInt();
       const HelperSleep2 = new Helper(null, null, val)
       await HelperSleep2.sleep();
@@ -330,14 +363,18 @@ const getResults = async () => {
       // rawArray[0][Object.keys(rawArray[0])[0]] is the way to access the first data GUID as our data is in the first property value in the obj returned from firebase
       let singleDayScrape = rawArray[0][Object.keys(rawArray[0])[0]];
       let fullCategoryScrape = [];
-      // go through all records - n is arbitrary for the last year
+      // go through all records - n is arbitrary
       const rawArrFirstVal = rawArray[0]
       const numOfRecordsOnBranch = Object.keys(rawArrFirstVal).length;
       for (let i = 0; i < numOfRecordsOnBranch; i++) {
-        console.log(Object.keys(rawArrFirstVal)[i]);
-        if (Object.keys(rawArrFirstVal)[i].date !== 'date') {
-          fullCategoryScrape.push(rawArrFirstVal[Object.keys(rawArrFirstVal)[i]]);
-        }
+        console.log(rawArrFirstVal);
+        // console.log(rawArrFirstVal[0].hasOwnProperty('date'))
+        // if (Object.keys(rawArrFirstVal)[i].date !== 'date') {
+        //   console.log(rawArrFirstVal[i])
+        //   fullCategoryScrape.push(rawArrFirstVal[Object.keys(rawArrFirstVal)[i]]);
+        // } else {
+        //   console.log('not a real date')
+        // }
       }
       let sortedByDateFullCategory = fullCategoryScrape.sort(function (left, right) {
         return moment.utc(left.date).diff(moment.utc(right.date))

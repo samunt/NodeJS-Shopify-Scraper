@@ -3,10 +3,9 @@ class Helper {
     // ..and an (optional) custom class constructor. If one is
     // not supplied, a default constructor is used instead:
     // constructor() { }
-    constructor(min, max, ms) {
+    constructor(min, max) {
         this.min = min;
         this.max = max;
-        this.ms = ms;
     }
 
 
@@ -29,9 +28,9 @@ class Helper {
     }
 
     // sleep function so we don't make requests too quickly and get the IP blacklisted
-    sleep(){
+    sleep(ms){
         return new Promise(resolve => {
-            setTimeout(resolve,this.ms)
+            setTimeout(resolve,ms)
         })
     }
 
