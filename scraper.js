@@ -281,7 +281,7 @@ const getResults = async () => {
       do {
         //  3.1. go to href of i like https://ocs.ca/products/napali-cbd-pre-roll-haven-st
         $ = await fetchDataFromExternalAPI(null, null, 'individualPage');
-        // 3.2 fill up the model, and if the element doesn’t exist, add null.
+        // 3.2 fill up the model, and if the element doesnt exist, add null.
 
         // in stock
         // check if pre roll
@@ -291,8 +291,11 @@ const getResults = async () => {
           $('.notice .notice--stock .online-availability-wrapper h5 .notice__heading').text().includes('In stock') ?
               genericProductModel.inStock = true : genericProductModel.inStock = false;
           if ($('.swatches li label').hasAttribute('aria-describedby')) {
-            // needs to go in array
-            genericProductModel.gramsOfBudPerUnit = $
+            let grams = $('.swatches li label .swatch__total').text();
+            let totalPrice = $('.swatches li label .swatch__price').text().toInt();
+
+            genericProductModel.gramsOfBudTotal = grams;
+            genericProductModel.pricePerGram = totalPrice;
           }
         }
 
@@ -302,6 +305,7 @@ const getResults = async () => {
           cdbRangeForBud: null ,
           thcRangeForBud: null,
           gramsOfBudPerUnit: null,
+          gramsOfBudTotal: null,
           cbdMgPerMl: null,
           thcMgPerMl: null,
           grams: null,
