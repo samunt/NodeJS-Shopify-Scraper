@@ -45,86 +45,25 @@ const getResults = async () => {
   let db = admin.database();
   // create db path reference
   let refOCSfull = db.ref("OCSfullJSONversion/");
-  let refOCSbestSellers = db.ref("OCSbestSellers/0");
-  let refBCfull = db.ref("BCfull/0");
   let dateToString = date.toString();
   const Helper = require('./helperFunctions')
   const HelperFunctions = new Helper(3000, 8000, null);
   // prep db references by adding a timestamp
-  console.log('guid', HelperFunctions.guid());
-  let pageRefBestSellersOCS = refOCSbestSellers.child(HelperFunctions.guid());
   let guid = HelperFunctions.guid();
   let pageRefOCS = refOCSfull.child(dateToString + '/GUID/' + guid);
-  let pageRefBC = refBCfull.child(HelperFunctions.guid());
   if (shouldRunScraper === true) { //
 
-    ///////////////////////////////
-    //
-    //  BEST SELLERS FROM OCS BELOW
-    //
-    ///////////////////////////////
-    // best sellers stuff
-    // console.log('start ocs best sellers');
-    let bestSellersVendorOCS = [];
-    let bestSellersTitleOCS = [];
-    let bestSellersPlantTypeOCS = [];
-    let bestSellersTHCrangeOCS = [];
-    let bestSellersCBDrangeOCS = [];
-    let bestSellersPriceOCS = [];
-    let bestSellersArrayOCS = [];
-    $ = undefined;
-    $ = await fetchDataFromExternalAPI(null, 'ON', 'bestSellers');
-    // grab vendor
-    $('.product-carousel__products article h4').each((index, element) => {
-      if (index === 0 || index % 3 === 0) {
-        bestSellersVendorOCS.push($(element).text());
-      }
-    });
-    // grab title
-    $('.product-carousel__products .product-tile__data h3').each((index, element) => {
-      bestSellersTitleOCS.push($(element).text());
-    });
-    // grab plant type
-    $('.product-carousel__products .product-tile__properties li:nth-child(1) p').each((index, element) => {
-      bestSellersPlantTypeOCS.push($(element).text());
-    });
-    // grab thc range
-    $('.product-carousel__products .product-tile__properties li:nth-child(2) p').each((index, element) => {
-      bestSellersTHCrangeOCS.push($(element).text());
-    });
-    //grab cbd range
-    $('.product-carousel__products .product-tile__properties li:nth-child(3) p').each((index, element) => {
-      bestSellersCBDrangeOCS.push($(element).text());
-    });
-    $('.product-carousel__products .product-tile__info .product-tile__price').each((index, element) => {
-      bestSellersPriceOCS.push($(element).text());
-    });
-    const dbParams = {
-      date: new Date().toDateString(),
-      vendors: [...bestSellersVendorOCS],
-      productTitle: [...bestSellersTitleOCS],
-      plantType: [...bestSellersPlantTypeOCS],
-      thcRange: [...bestSellersTHCrangeOCS],
-      cbdRange: [...bestSellersCBDrangeOCS],
-      price: [...bestSellersPriceOCS]
-    };
-    bestSellersArrayOCS.push(dbParams);
-
     ////////////////////////////////////////
     //
-    //  BEST SELLERS FROM OCS ABOVE
-    //
-    ////////////////////////////////////////
-
-    ////////////////////////////////////////
-    //
-    //  FULL LISTING FROM OCS BELOW
+    //  ALL SHOPIFY COLLECTIONS FROM OCS BELOW
     //
     ////////////////////////////////////////
     let productArrayOCS = [];
 
     let collectionsArray = [];
     let JSONproductList;
+
+    // get collections and push to array
     JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'dried-flower-cannabis');
     collectionsArray.push(JSONproductList);
     JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'pre-rolled');
@@ -133,8 +72,15 @@ const getResults = async () => {
     collectionsArray.push(JSONproductList);
     JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'oil');
     collectionsArray.push(JSONproductList);
+    JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'best-sellers');
+    collectionsArray.push(JSONproductList);
 
-    for (let i = 0; i < 4; i++) {
+    // https://ocs.ca/collections/best-sellers/products.json
+    let pageRefOCS;
+    // dump the array of collections into a reference for the db
+    for (let i = 0; i < 5; i++) {
+      pageRefOCS = refOCSfull.child('COLLECTION/' + collectionsArray[i] + '/GUID/' + guid + '/DATE/' + dateToString);
+      // send the collection to the db
       pageRefOCS.set(collectionsArray[i]);
     }
 
@@ -145,28 +91,6 @@ const getResults = async () => {
     //
     ////////////////////////////////////////
 
-    ////////////////////////////////////////
-    //
-    //  SEND DATA SETS TO FIREBASE BELOW
-    //
-    ////////////////////////////////////////
-    // send data to DB
-    // console.log('here')
-    // pageRefOCS.set(productArrayOCS);
-    pageRefBestSellersOCS.set(bestSellersArrayOCS);
-    // pageRefBC.set(productArrayBC);
-    // console.log('here2')
-    ////////////////////////////////////////
-    //
-    //  SEND DATA SETS TO FIREBASE ABOVE
-    //
-    ////////////////////////////////////////
-    const params = {
-      ec: "Provincial Store Full Listing",
-      ea: "Scrape",
-      el: "OCSfullListing",
-      productArrayOCS
-    };
   } else {
 
     // OCSfull.0.{{GUID}}.0.date
