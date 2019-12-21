@@ -53,7 +53,8 @@ const getResults = async () => {
   // prep db references by adding a timestamp
   console.log('guid', HelperFunctions.guid());
   let pageRefBestSellersOCS = refOCSbestSellers.child(HelperFunctions.guid());
-  let pageRefOCS = refOCSfull.child(HelperFunctions.guid());
+  let guid = HelperFunctions.guid();
+  let pageRefOCS = refOCSfull.child(dateToString + '/GUID/' + guid);
   let pageRefBC = refBCfull.child(HelperFunctions.guid());
   if (shouldRunScraper === true) { //
 
