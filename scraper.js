@@ -5,6 +5,11 @@
 // k-NN -> figure out the model and data points we want to match
 //
 
+// I can traverse shopify store by collections
+// URL is like /collections/{{handle}}/products.json
+// OCS has: /collections/dried-flower-cannabis,  /collections/pre-rolled, /collections/capsules /oils
+// Then we just parse the JSON!
+
 
 const cheerio = require("cheerio");
 const axios = require("axios");
@@ -13,17 +18,11 @@ const ua = require('universal-analytics');
 const visitor = ua('UA-150484895-2');
 const moment = require('moment');
 const date = new Date();
-const shouldRunScraper = false;
+const shouldRunScraper = true;
 // $ is used for promises returned from url fetch
 let $;
 
-// const fetchIndividualProductDataForQC = async (productURL) => {
-//   let url = productURL;
-//   const result = await axios.get(url);
-//   return cheerio.load(result.data);
-// };
-
-const fetchDataFromExternalAPI = async (pageNum, province, type) => {
+const fetchDataFromExternalAPI = async (pageNum, province, type, collection) => {
   let url;
   if (province === 'ON' && type === 'fullListing') {
     url = "https://ocs.ca/collections/all-cannabis-products?&page=" + pageNum;
@@ -33,8 +32,8 @@ const fetchDataFromExternalAPI = async (pageNum, province, type) => {
     url = "https://www.bccannabisstores.com/collections/cannabis-products?page=" + pageNum + "&grid_list=grid-view";
   } else if (province === 'QC' && type === 'fullListing') {
     url = "https://www.sqdc.ca/en-CA/Search?keywords=*&sortDirection=asc&page=" + pageNum;
-  } else if (type === 'individualPage') {
-
+  } else if (province === 'ON' && type === 'JSON') {
+    url = "https://www.ocs.ca/collections/" + collection + "/products.json";
   };
   const result = await axios.get(url);
   return cheerio.load(result.data);
@@ -45,7 +44,7 @@ const getResults = async () => {
   // Get a database reference to our blog
   let db = admin.database();
   // create db path reference
-  let refOCSfull = db.ref("OCSfullVersion2/");
+  let refOCSfull = db.ref("OCSfullJSONversion/");
   let refOCSbestSellers = db.ref("OCSbestSellers/0");
   let refBCfull = db.ref("BCfull/0");
   let dateToString = date.toString();
@@ -57,110 +56,6 @@ const getResults = async () => {
   let pageRefOCS = refOCSfull.child(HelperFunctions.guid());
   let pageRefBC = refBCfull.child(HelperFunctions.guid());
   if (shouldRunScraper === true) { //
-    ///////////////////////////////
-    //
-    // FULL LISTING FROM quebec BELOW
-    //
-    ///////////////////////////////
-    let productArrayQC = [];
-    let productTitleQC = [];
-    let plantTypeQC = [];
-    let thcRangeQC = [];
-    let cbdRangeQC = [];
-    let priceQC = [];
-    let vendorQC = [];
-    let totalNumberOfPagesQC = 1;
-    let pageNumQC = 1;
-
-    // do {
-    //   $ = await fetchDataForQCfullProductListing();
-    //   // only need to do this once
-    //   if (pageNumBC == 1) {
-    //     totalNumberOfPagesQC = parseInt($('.pagination li:nth-last-child(2) a').text());
-    //   }
-    //   // go through each page
-    //   // go through each item on each page
-    //     // get get url for each item
-    //     // put url into array
-    //   // fetch product
-    //   pageNumQC++;
-    //   await sleep(getRandomInt(3000, 8000));
-    // } while (totalNumberOfPagesQC > pageNumQC);
-
-    ///////////////////////////////
-    //
-    // FULL LISTING FROM quebec ABOVE
-    //
-    ///////////////////////////////
-
-    ///////////////////////////////
-    //
-    // FULL LISTING FROM bccannabisstores BELOW
-    //
-    ///////////////////////////////
-    // console.log('start bc');
-    let productArrayBC = [];
-    let productTitleBC = [];
-    let plantTypeBC = [];
-    let thcRangeBC = [];
-    let cbdRangeBC = [];
-    let priceBC = [];
-    let vendorBC = [];
-    let totalNumberOfPagesBC = 1;
-    let pageNumBC = 1;
-    let imgLinkBC = [];
-
-    // do statement is for the page iterator
-    // console.log('BC stuff')
-    // console.log('1')
-    do {
-      // console.log('before')
-      $ = await fetchDataFromExternalAPI(pageNumBC, 'BC', 'fullListing');
-      // only need to do this once
-      if (pageNumBC == 1) {
-        totalNumberOfPagesBC = parseInt($('.pagination--inner li:nth-last-child(2) a').text());
-        // console.log('page bc', totalNumberOfPagesBC);
-      }
-      $('.productitem--title a span').each((index, element) => {
-        productTitleBC.push($(element).text());
-      });
-      $('.productitem--vendor').each((index, element) => {
-        vendorBC.push($(element).text());
-      });
-      $('.price--main .money').each((index, element) => {
-        priceBC.push($(element).text());
-      });
-      $('.productitem--strain-characteristics span:nth-child(1)').each((index, element) => {
-        thcRangeBC.push($(element).text());
-      });
-      $('.productitem--strain-characteristics span:nth-child(2)').each((index, element) => {
-        cbdRangeBC.push($(element).text());
-        plantTypeBC.push('Not Available')
-      });
-      $('.productitem--image-link img').each((index, element) => {
-        imgLinkBC.push($(element).attr('src'));
-      });
-      pageNumBC++;
-      const val = HelperFunctions.getRandomInt();
-      const HelperSleep1 = new Helper(null, null, val)
-      await HelperSleep1.sleep(val);
-      console.log('random', HelperFunctions.getRandomInt())
-    } while (totalNumberOfPagesBC > pageNumBC);
-    const dbBCparams = {
-      date: new Date().toDateString(),
-      vendors: [...vendorBC],
-      productTitle: [...productTitleBC],
-      plantType: [...plantTypeBC],
-      thcRange: [...thcRangeBC],
-      cbdRange: [...cbdRangeBC],
-      price: [...priceBC]
-    };
-    productArrayBC.push(dbBCparams);
-    ///////////////////////////////////////
-    //
-    // FULL LISTING FROM bccannabisstores ABOVE
-    //
-    ///////////////////////////////
 
     ///////////////////////////////
     //
@@ -225,111 +120,24 @@ const getResults = async () => {
     //  FULL LISTING FROM OCS BELOW
     //
     ////////////////////////////////////////
-    // console.log('start ocs full listing');
-    let genericProductModel = {
-      productType: null,
-      cbdRangeForBud: null ,
-      thcRangeForBud: null,
-      gramsOfBudPerUnit: null,
-      cbdMgPerMl: null,
-      thcMgPerMl: null,
-      grams: null,
-      pricePerGram: null,
-      inStock: null,
-      mlPerBottle: null,
-      capsulesPerBottle: null,
-      thcMgPerCapsule: null,
-      cbdMgPerCapsule: null,
-      date: null,
-      imageUrl: null,
-      plantType: null,
-      price: null,
-      mlPerUnit: null,
-      terpenes: [],
-      vendor: null,
-      productTitle: null
-    };
-
-    let vendorOCS = [];
-    let productTitleOCS = [];
-    let plantTypeOCS = [];
-    let thcRangeOCS = [];
-    let cbdRangeOCS = [];
-    let priceOCS = [];
-    let totalNumberOfPagesOCS = 1;
     let productArrayOCS = [];
-    let pageNumOCS = 1;
-    let imageLinkOCS = [];
-    let inStockOCS = [];
-    let arrToHoldLinksOfPages = [];
 
-    do {
-      //  1. go to ocs /all-cannabis products + pageNum
-      $ = await fetchDataFromExternalAPI(pageNumOCS, 'ON', 'fullListing');
-      // first check how many total pages there are - only need to do once
-      if (pageNumOCS === 1) {
-        totalNumberOfPagesOCS = parseInt($('.pagination li:nth-last-child(2)').text());
-        // console.log('total number of pages', totalNumberOfPagesOCS);
-      }
-      //  2. get href of i of all the .product-tile__title of the page and put into array
-      $('.product-tile__info .product-tile__data a').each((index, element) => {
-        let link = $(value).attr('href');
-        arrToHoldLinksOfPages.push(link);
-      });
-      //  3. while (i < i.length)
-      let counter = 0
-      do {
-        //  3.1. go to href of i like https://ocs.ca/products/napali-cbd-pre-roll-haven-st
-        $ = await fetchDataFromExternalAPI(null, null, 'individualPage');
-        // 3.2 fill up the model, and if the element doesnt exist, add null.
+    let collectionsArray = [];
+    let JSONproductList;
+    JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'dried-flower-cannabis');
+    collectionsArray.push(JSONproductList);
+    JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'pre-rolled');
+    collectionsArray.push(JSONproductList);
+    JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'capsules');
+    collectionsArray.push(JSONproductList);
+    JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'oil');
+    collectionsArray.push(JSONproductList);
 
-        // in stock
-        // check if pre roll
-        if ($('.product__title h2').text().includes('Pre-Roll')) {
-          genericProductModel.productType = 'Pre-Roll';
-          genericProductModel.productTitle = $('.product__title h2').text();
-          $('.notice .notice--stock .online-availability-wrapper h5 .notice__heading').text().includes('In stock') ?
-              genericProductModel.inStock = true : genericProductModel.inStock = false;
-          if ($('.swatches li label').hasAttribute('aria-describedby')) {
-            let grams = $('.swatches li label .swatch__total').text();
-            let totalPrice = $('.swatches li label .swatch__price').text().toInt();
-
-            genericProductModel.gramsOfBudTotal = grams;
-            genericProductModel.pricePerGram = totalPrice;
-          }
-        }
+    for (let i = 0; i < 4; i++) {
+      pageRefOCS.set(collectionsArray[i]);
+    }
 
 
-        let genericProductModel = {
-          productType: null,
-          cdbRangeForBud: null ,
-          thcRangeForBud: null,
-          gramsOfBudPerUnit: null,
-          gramsOfBudTotal: null,
-          cbdMgPerMl: null,
-          thcMgPerMl: null,
-          grams: null,
-          pricePerGram: null,
-          inStock: null,
-          mlPerBottle: null,
-          capsulesPerBottle: null,
-          thcMgPerCapsule: null,
-          cbdMgPerCapsule: null,
-          date: null,
-          imageUrl: null,
-          plantType: null,
-          price: null,
-          mlPerUnit: null,
-          terpenes: [],
-          vendor: null,
-          productTitle: null
-        };
-        counter++;
-      } while (counter < arrToHoldLinksOfPages.length);
-      const val = HelperFunctions.getRandomInt();
-      const HelperSleep2 = new Helper(null, null, val)
-      await HelperSleep2.sleep();
-    } while (totalNumberOfPagesOCS > pageNumOCS);
     ////////////////////////////////////////
     //
     //  FULL PRODUCT LISTING FROM OCS ABOVE
@@ -343,9 +151,9 @@ const getResults = async () => {
     ////////////////////////////////////////
     // send data to DB
     // console.log('here')
-    pageRefOCS.set(productArrayOCS);
+    // pageRefOCS.set(productArrayOCS);
     pageRefBestSellersOCS.set(bestSellersArrayOCS);
-    pageRefBC.set(productArrayBC);
+    // pageRefBC.set(productArrayBC);
     // console.log('here2')
     ////////////////////////////////////////
     //
