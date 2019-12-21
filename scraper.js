@@ -22,26 +22,6 @@ const date = new Date();
 const shouldRunScraper = true;
 let settings = { method: "Get" };
 
-const fetchDataFromExternalAPI = async (pageNum, province, type, collection) => {
-  let url;
-  if (province === 'ON' && type === 'JSON') {
-    url = "https://www.ocs.ca/collections/" + collection + "/products.json";
-    console.log(url)
-    fetch(url, settings)
-        .then(res => res.json())
-        .then((json) => {
-          // console.log(json)
-          // do something with JSON
-          console.log(json)
-          return json;
-        });
-  };
-
-
-};
-
-
-
 // this function is called first
 const getResults = async () => {
   // Get a database reference to our blog
@@ -125,8 +105,6 @@ const getResults = async () => {
           return;
         });
 
-    console.log('done');
-    return;
     ////////////////////////////////////////
     //
     //  FULL PRODUCT LISTING FROM OCS ABOVE
