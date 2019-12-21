@@ -19,20 +19,10 @@ const visitor = ua('UA-150484895-2');
 const moment = require('moment');
 const date = new Date();
 const shouldRunScraper = true;
-// $ is used for promises returned from url fetch
-let $;
 
 const fetchDataFromExternalAPI = async (pageNum, province, type, collection) => {
   let url;
-  if (province === 'ON' && type === 'fullListing') {
-    url = "https://ocs.ca/collections/all-cannabis-products?&page=" + pageNum;
-  } else if (province === 'ON' && type === 'bestSellers') {
-    url = "https://ocs.ca";
-  } else if (province === 'BC' && type === 'fullListing') {
-    url = "https://www.bccannabisstores.com/collections/cannabis-products?page=" + pageNum + "&grid_list=grid-view";
-  } else if (province === 'QC' && type === 'fullListing') {
-    url = "https://www.sqdc.ca/en-CA/Search?keywords=*&sortDirection=asc&page=" + pageNum;
-  } else if (province === 'ON' && type === 'JSON') {
+  if (province === 'ON' && type === 'JSON') {
     url = "https://www.ocs.ca/collections/" + collection + "/products.json";
   };
   const result = await axios.get(url);
@@ -58,31 +48,46 @@ const getResults = async () => {
     //  ALL SHOPIFY COLLECTIONS FROM OCS BELOW
     //
     ////////////////////////////////////////
-    let productArrayOCS = [];
+    let pageRefOCS;
 
     let collectionsArray = [];
     let JSONproductList;
+    // send the collection to the db
 
     // get collections and push to array
     JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'dried-flower-cannabis');
     collectionsArray.push(JSONproductList);
+    guid = HelperFunctions.guid()
+    pageRefOCS = refOCSfull.child('COLLECTION/' + 'dried-flower-cannabis' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
+    pageRefOCS.set(collectionsArray[0]);
+
     JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'pre-rolled');
     collectionsArray.push(JSONproductList);
+    guid = HelperFunctions.guid()
+    pageRefOCS = refOCSfull.child('COLLECTION/' + 'pre-rolled' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
+    pageRefOCS.set(collectionsArray[1]);
+
     JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'capsules');
     collectionsArray.push(JSONproductList);
+    guid = HelperFunctions.guid()
+    pageRefOCS = refOCSfull.child('COLLECTION/' + 'capsules' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
+    pageRefOCS.set(collectionsArray[2]);
+
     JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'oil');
     collectionsArray.push(JSONproductList);
+    guid = HelperFunctions.guid()
+    pageRefOCS = refOCSfull.child('COLLECTION/' + 'oil' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
+    pageRefOCS.set(collectionsArray[3]);
+
     JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'best-sellers');
     collectionsArray.push(JSONproductList);
+    guid = HelperFunctions.guid()
+    pageRefOCS = refOCSfull.child('COLLECTION/' + 'best-sellers' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
+    pageRefOCS.set(collectionsArray[4]);
+
 
     // https://ocs.ca/collections/best-sellers/products.json
-    let pageRefOCS;
     // dump the array of collections into a reference for the db
-    for (let i = 0; i < 5; i++) {
-      pageRefOCS = refOCSfull.child('COLLECTION/' + collectionsArray[i] + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
-      // send the collection to the db
-      pageRefOCS.set(collectionsArray[i]);
-    }
 
 
     ////////////////////////////////////////

@@ -18,8 +18,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/scraper.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="177">
-              <caret line="53" column="13" lean-forward="true" selection-start-line="53" selection-start-column="13" selection-end-line="53" selection-end-column="13" />
+            <state relative-caret-position="147">
+              <caret line="54" selection-start-line="54" selection-end-line="54" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
@@ -45,7 +45,6 @@
       <find>inStock</find>
       <find>foreach</find>
       <find>gui</find>
-      <find>guid</find>
       <find>getrandom</find>
       <find>Help</find>
       <find>help</find>
@@ -70,6 +69,7 @@
       <find>dat</find>
       <find>date</find>
       <find>datetostr</find>
+      <find>guid</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -168,12 +168,12 @@
       <workItem from="1572046679341" duration="31278000" />
       <workItem from="1572736037883" duration="23022000" />
       <workItem from="1573264825675" duration="5234000" />
-      <workItem from="1573410934047" duration="21763000" />
+      <workItem from="1573410934047" duration="22305000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="126569000" />
+    <option name="totallyTimeSpent" value="127111000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -369,8 +369,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/scraper.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="177">
-          <caret line="53" column="13" lean-forward="true" selection-start-line="53" selection-start-column="13" selection-end-line="53" selection-end-column="13" />
+        <state relative-caret-position="147">
+          <caret line="54" selection-start-line="54" selection-end-line="54" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>
