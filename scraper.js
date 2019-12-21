@@ -13,21 +13,34 @@
 
 const cheerio = require("cheerio");
 const axios = require("axios");
+const fetch = require('node-fetch');
 const admin = require("firebase-admin");
 const ua = require('universal-analytics');
 const visitor = ua('UA-150484895-2');
 const moment = require('moment');
 const date = new Date();
 const shouldRunScraper = true;
+let settings = { method: "Get" };
 
 const fetchDataFromExternalAPI = async (pageNum, province, type, collection) => {
   let url;
   if (province === 'ON' && type === 'JSON') {
     url = "https://www.ocs.ca/collections/" + collection + "/products.json";
+    console.log(url)
+    fetch(url, settings)
+        .then(res => res.json())
+        .then((json) => {
+          // console.log(json)
+          // do something with JSON
+          console.log(json)
+          return json;
+        });
   };
-  const result = await axios.get(url);
-  return cheerio.load(result.data);
+
+
 };
+
+
 
 // this function is called first
 const getResults = async () => {
@@ -48,48 +61,72 @@ const getResults = async () => {
     //  ALL SHOPIFY COLLECTIONS FROM OCS BELOW
     //
     ////////////////////////////////////////
-    let pageRefOCS;
-
-    let collectionsArray = [];
-    let JSONproductList;
-    // send the collection to the db
 
     // get collections and push to array
-    JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'dried-flower-cannabis');
-    collectionsArray.push(JSONproductList);
+    let urlDry = "https://www.ocs.ca/collections/" + 'dried-flower-cannabis' + "/products.json";
     guid = HelperFunctions.guid()
-    pageRefOCS = refOCSfull.child('COLLECTION/' + 'dried-flower-cannabis' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
-    pageRefOCS.set(collectionsArray[0]);
+    let pageRefOCSdry = refOCSfull.child('COLLECTION/' + 'dried-flower-cannabis' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
+    fetch(urlDry, settings)
+        .then(res => res.json())
+        .then((JSONproductListDriedFlower) => {
+          // console.log(json)
+          // do something with JSON
+          pageRefOCSdry.set(JSONproductListDriedFlower);
+          console.log('dried flow')
+          return;
+        });
 
-    JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'pre-rolled');
-    collectionsArray.push(JSONproductList);
+    let urlPre = "https://www.ocs.ca/collections/" + 'pre-rolled' + "/products.json";
     guid = HelperFunctions.guid()
-    pageRefOCS = refOCSfull.child('COLLECTION/' + 'pre-rolled' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
-    pageRefOCS.set(collectionsArray[1]);
+    let pageRefOCSpreRolled = refOCSfull.child('COLLECTION/' + 'pre-rolled' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
+    fetch(urlPre, settings)
+        .then(res => res.json())
+        .then((JSONproductListPreRolled) => {
+          // console.log(json)
+          // do something with JSON
+          pageRefOCSpreRolled.set(JSONproductListPreRolled);
+          console.log('pre roll')
+          return;
+        });
 
-    JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'capsules');
-    collectionsArray.push(JSONproductList);
+    let urlCapsule = "https://www.ocs.ca/collections/" + 'capsules' + "/products.json";
     guid = HelperFunctions.guid()
-    pageRefOCS = refOCSfull.child('COLLECTION/' + 'capsules' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
-    pageRefOCS.set(collectionsArray[2]);
+    let pageRefOCScapsules = refOCSfull.child('COLLECTION/' + 'capsules' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
+    fetch(urlCapsule, settings)
+        .then(res => res.json())
+        .then((JSONproductListCapsules) => {
+          // do something with JSON
+          pageRefOCScapsules.set(JSONproductListCapsules);
+          console.log('capsule')
+          return;
+        });
 
-    JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'oil');
-    collectionsArray.push(JSONproductList);
+    let urlOil = "https://www.ocs.ca/collections/" + 'oil' + "/products.json";
     guid = HelperFunctions.guid()
-    pageRefOCS = refOCSfull.child('COLLECTION/' + 'oil' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
-    pageRefOCS.set(collectionsArray[3]);
+    let pageRefOCSoil = refOCSfull.child('COLLECTION/' + 'oil' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
+    fetch(urlOil, settings)
+        .then(res => res.json())
+        .then((JSONproductListOil) => {
+          // do something with JSON
+          pageRefOCSoil.set(JSONproductListOil);
+          console.log('oil')
+          return;
+        });
 
-    JSONproductList = await fetchDataFromExternalAPI(null, 'ON', 'JSON', 'best-sellers');
-    collectionsArray.push(JSONproductList);
+    let urlBestSellers = "https://www.ocs.ca/collections/" + 'best-sellers' + "/products.json";
     guid = HelperFunctions.guid()
-    pageRefOCS = refOCSfull.child('COLLECTION/' + 'best-sellers' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
-    pageRefOCS.set(collectionsArray[4]);
+    let pageRefOCSbestSellers = refOCSfull.child('COLLECTION/' + 'oil' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
+    fetch(urlBestSellers, settings)
+        .then(res => res.json())
+        .then((JSONproductListBestSellers) => {
+          // do something with JSON
+          pageRefOCSbestSellers.set(JSONproductListBestSellers);
+          console.log('best seller')
+          return;
+        });
 
-
-    // https://ocs.ca/collections/best-sellers/products.json
-    // dump the array of collections into a reference for the db
-
-
+    console.log('done');
+    return;
     ////////////////////////////////////////
     //
     //  FULL PRODUCT LISTING FROM OCS ABOVE
@@ -109,7 +146,7 @@ const getResults = async () => {
       const rawArrFirstVal = rawArray[0]
       const numOfRecordsOnBranch = Object.keys(rawArrFirstVal).length;
       for (let i = 0; i < numOfRecordsOnBranch; i++) {
-        console.log(rawArrFirstVal);
+        // console.log(rawArrFirstVal);
         // console.log(rawArrFirstVal[0].hasOwnProperty('date'))
         // if (Object.keys(rawArrFirstVal)[i].date !== 'date') {
         //   console.log(rawArrFirstVal[i])
