@@ -46,11 +46,11 @@ const getResults = async () => {
   // create db path reference
   let refOCSfull = db.ref("OCSfullJSONversion/");
   let dateToString = date.toString();
+  let dateToStrNoSpaces = dateToString.replace(/\s/g, '');
   const Helper = require('./helperFunctions')
   const HelperFunctions = new Helper(3000, 8000, null);
   // prep db references by adding a timestamp
   let guid = HelperFunctions.guid();
-  let pageRefOCS = refOCSfull.child(dateToString + '/GUID/' + guid);
   if (shouldRunScraper === true) { //
 
     ////////////////////////////////////////
@@ -79,7 +79,7 @@ const getResults = async () => {
     let pageRefOCS;
     // dump the array of collections into a reference for the db
     for (let i = 0; i < 5; i++) {
-      pageRefOCS = refOCSfull.child('COLLECTION/' + collectionsArray[i] + '/GUID/' + guid + '/DATE/' + dateToString);
+      pageRefOCS = refOCSfull.child('COLLECTION/' + collectionsArray[i] + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
       // send the collection to the db
       pageRefOCS.set(collectionsArray[i]);
     }
