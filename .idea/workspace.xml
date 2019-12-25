@@ -18,8 +18,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/scraper.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="256">
-              <caret line="107" selection-start-line="107" selection-end-line="107" />
+            <state relative-caret-position="192">
+              <caret line="37" column="24" lean-forward="true" selection-start-line="37" selection-start-column="24" selection-end-line="37" selection-end-column="24" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
@@ -40,11 +40,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>foreach</find>
-      <find>gui</find>
-      <find>getrandom</find>
-      <find>Help</find>
-      <find>help</find>
       <find>console.lo</find>
       <find>random</find>
       <find>helper</find>
@@ -70,6 +65,11 @@
       <find>set</find>
       <find>console</find>
       <find>fetchDataFromExternalAPI</find>
+      <find>guid = HelperFunctions.guid()</find>
+      <find>+ '/GUID/' + guid</find>
+      <find>+ '/DATE/'</find>
+      <find>dateToStrNoSpaces</find>
+      <find>dateToStr</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -168,12 +168,12 @@
       <workItem from="1572046679341" duration="31278000" />
       <workItem from="1572736037883" duration="23022000" />
       <workItem from="1573264825675" duration="5234000" />
-      <workItem from="1573410934047" duration="24640000" />
+      <workItem from="1573410934047" duration="25102000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="129446000" />
+    <option name="totallyTimeSpent" value="129908000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -369,8 +369,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/scraper.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="107" selection-start-line="107" selection-end-line="107" />
+        <state relative-caret-position="192">
+          <caret line="37" column="24" lean-forward="true" selection-start-line="37" selection-start-column="24" selection-end-line="37" selection-end-column="24" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>

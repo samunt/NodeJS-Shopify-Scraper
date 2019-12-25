@@ -27,9 +27,8 @@ const getResults = async () => {
   // Get a database reference to our blog
   let db = admin.database();
   // create db path reference
-  let refOCSfull = db.ref("OCSfullJSONversion/");
+  let refOCSfull = db.ref("OCStwoPointOscrape");
   let dateToString = date.toString();
-  let dateToStrNoSpaces = dateToString.replace(/\s/g, '');
   const Helper = require('./helperFunctions')
   const HelperFunctions = new Helper(3000, 8000, null);
   // prep db references by adding a timestamp
@@ -44,8 +43,7 @@ const getResults = async () => {
 
     // get collections and push to array
     let urlDry = "https://www.ocs.ca/collections/" + 'dried-flower-cannabis' + "/products.json";
-    guid = HelperFunctions.guid()
-    let pageRefOCSdry = refOCSfull.child('COLLECTION/' + 'dried-flower-cannabis' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
+    let pageRefOCSdry = refOCSfull.child('COLLECTION/' + 'dried-flower-cannabis' + dateToStr);
     fetch(urlDry, settings)
         .then(res => res.json())
         .then((JSONproductListDriedFlower) => {
@@ -57,8 +55,7 @@ const getResults = async () => {
         });
 
     let urlPre = "https://www.ocs.ca/collections/" + 'pre-rolled' + "/products.json";
-    guid = HelperFunctions.guid()
-    let pageRefOCSpreRolled = refOCSfull.child('COLLECTION/' + 'pre-rolled' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
+    let pageRefOCSpreRolled = refOCSfull.child('COLLECTION/' + 'pre-rolled' + dateToString);
     fetch(urlPre, settings)
         .then(res => res.json())
         .then((JSONproductListPreRolled) => {
@@ -70,8 +67,7 @@ const getResults = async () => {
         });
 
     let urlCapsule = "https://www.ocs.ca/collections/" + 'capsules' + "/products.json";
-    guid = HelperFunctions.guid()
-    let pageRefOCScapsules = refOCSfull.child('COLLECTION/' + 'capsules' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
+    let pageRefOCScapsules = refOCSfull.child('COLLECTION/' + 'capsules' + dateToString);
     fetch(urlCapsule, settings)
         .then(res => res.json())
         .then((JSONproductListCapsules) => {
@@ -82,8 +78,7 @@ const getResults = async () => {
         });
 
     let urlOil = "https://www.ocs.ca/collections/" + 'oil' + "/products.json";
-    guid = HelperFunctions.guid()
-    let pageRefOCSoil = refOCSfull.child('COLLECTION/' + 'oil' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
+    let pageRefOCSoil = refOCSfull.child('COLLECTION/' + 'oil' + dateToString);
     fetch(urlOil, settings)
         .then(res => res.json())
         .then((JSONproductListOil) => {
@@ -94,8 +89,7 @@ const getResults = async () => {
         });
 
     let urlBestSellers = "https://www.ocs.ca/collections/" + 'best-sellers' + "/products.json";
-    guid = HelperFunctions.guid()
-    let pageRefOCSbestSellers = refOCSfull.child('COLLECTION/' + 'oil' + '/GUID/' + guid + '/DATE/' + dateToStrNoSpaces);
+    let pageRefOCSbestSellers = refOCSfull.child('COLLECTION/' + 'oil' + dateToString);
     fetch(urlBestSellers, settings)
         .then(res => res.json())
         .then((JSONproductListBestSellers) => {
