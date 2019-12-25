@@ -1,15 +1,3 @@
-// TODO
-// Write script to homogenize the strings, get rid of extra spaces, slashes, etc.
-// Write script to save an instance of the db to local machine so i dont waste so much money testing
-// Sort by date (need to figure out how the object really looks like when it comes from firebase.
-// k-NN -> figure out the model and data points we want to match
-//
-
-// I can traverse shopify store by collections
-// URL is like /collections/{{handle}}/products.json
-// OCS has: /collections/dried-flower-cannabis,  /collections/pre-rolled, /collections/capsules /oils
-// Then we just parse the JSON!
-
 const fetch = require('node-fetch');
 const admin = require("firebase-admin");
 const date = new Date();
@@ -23,12 +11,8 @@ const getResults = async () => {
   // create db path reference
   let refOCSfull = db.ref("ONTARIO-OCS");
   let refBCfull = db.ref("BC-BCCS");
-
-    let dateToString = date.toString();
-  const Helper = require('./helperFunctions')
-  const HelperFunctions = new Helper(3000, 8000, null);
+  let dateToString = date.toString();
   // prep db references by adding a timestamp
-  let guid = HelperFunctions.guid();
   if (shouldRunScraper === true) {
       // BC CANNABIS STORE
 
