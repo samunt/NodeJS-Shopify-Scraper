@@ -10,14 +10,8 @@
 // OCS has: /collections/dried-flower-cannabis,  /collections/pre-rolled, /collections/capsules /oils
 // Then we just parse the JSON!
 
-
-const cheerio = require("cheerio");
-const axios = require("axios");
 const fetch = require('node-fetch');
 const admin = require("firebase-admin");
-const ua = require('universal-analytics');
-const visitor = ua('UA-150484895-2');
-const moment = require('moment');
 const date = new Date();
 const shouldRunScraper = true;
 let settings = { method: "Get" };
@@ -27,77 +21,155 @@ const getResults = async () => {
   // Get a database reference to our blog
   let db = admin.database();
   // create db path reference
-  let refOCSfull = db.ref("OCStwoPointO");
-  let dateToString = date.toString();
+  let refOCSfull = db.ref("ONTARIO-OCS");
+  let refBCfull = db.ref("BC-BCCS");
+
+    let dateToString = date.toString();
   const Helper = require('./helperFunctions')
   const HelperFunctions = new Helper(3000, 8000, null);
   // prep db references by adding a timestamp
   let guid = HelperFunctions.guid();
-  if (shouldRunScraper === true) { //
+  if (shouldRunScraper === true) {
+      // BC CANNABIS STORE
 
-    ////////////////////////////////////////
-    //
-    //  ALL SHOPIFY COLLECTIONS FROM OCS BELOW
-    //
-    ////////////////////////////////////////
+      let urlDryBC = "https://www.bccannabisstores.com/collections/flower/product.json";
+      let pageRefBCdry = refBCfull.child( 'dried-flower-cannabis/' + dateToString);
+      fetch(urlDryBC, settings)
+          .then(res => res.json())
+          .then((JSONproductListDriedFlower) => {
+              pageRefBCdry.set(JSONproductListDriedFlower);
+              console.log('dried flower bc')
+              return;
+          });
 
-    // get collections and push to array
-    let urlDry = "https://www.ocs.ca/collections/" + 'dried-flower-cannabis' + "/products.json";
-    let pageRefOCSdry = refOCSfull.child( 'dried-flower-cannabis/' + dateToString);
-    fetch(urlDry, settings)
-        .then(res => res.json())
-        .then((JSONproductListDriedFlower) => {
+      let urlPrerollBC = "https://www.bccannabisstores.com/collections/pre-rolls/products.json";
+      let pageRefBCpreroll = refBCfull.child( 'dried-flower-cannabis/' + dateToString);
+      fetch(urlPrerollBC, settings)
+          .then(res => res.json())
+          .then((JSONproductPreroll) => {
+              pageRefBCpreroll.set(JSONproductPreroll);
+              console.log('pre roll bc')
+              return;
+          });
+
+      let urlBCvape = "https://www.bccannabisstores.com/collections/vape-kits-cartridges/products.json";
+      let pageRefBCvape = refBCfull.child( 'vape-kits-cartridges/' + dateToString);
+      fetch(urlBCvape, settings)
+          .then(res => res.json())
+          .then((JSONproductListVape) => {
+              pageRefBCvape.set(JSONproductListVape);
+              console.log('pre roll bc')
+              return;
+          });
+
+      let urlBCoil = "https://www.bccannabisstores.com/collections/oil-products/products.json";
+      let pageRefBCoil = refBCfull.child( 'oil-products/' + dateToString);
+      fetch(urlBCoil, settings)
+          .then(res => res.json())
+          .then((JSONproductListOil) => {
+              pageRefBCoil.set(JSONproductListOil);
+              console.log('oil bc')
+              return;
+          });
+
+      let urlBCcapsules = "https://www.bccannabisstores.com/collections/capsules/products.json";
+      let pageRefBCcapsules = refBCfull.child( 'capsules/' + dateToString);
+      fetch(urlBCcapsules, settings)
+          .then(res => res.json())
+          .then((JSONproductListCapsules) => {
+              pageRefBCcapsules.set(JSONproductListCapsules);
+              console.log('capsules bc')
+              return;
+          });
+
+      let urlBCediblesBaked = "https://www.bccannabisstores.com/collections/baked-goods-snacks/products.json";
+      let pageRefBCediblesBaked = refBCfull.child( 'baked-goods-snacks/' + dateToString);
+      fetch(urlBCediblesBaked, settings)
+          .then(res => res.json())
+          .then((JSONproductListediblesBaked) => {
+              pageRefBCediblesBaked.set(JSONproductListediblesBaked);
+              console.log('baked bc')
+              return;
+          });
+
+      let urlBCedibleschocolate = "https://www.bccannabisstores.com/collections/chocolate/products.json";
+      let pageRefBCedibleschocolate = refBCfull.child( 'chocolate/' + dateToString);
+      fetch(urlBCedibleschocolate, settings)
+          .then(res => res.json())
+          .then((JSONproductListedibleschocolate) => {
+              pageRefBCedibleschocolate.set(JSONproductListedibleschocolate);
+              console.log('chocolate bc')
+              return;
+          });
+
+      let urlBCediblesCandy = "https://www.bccannabisstores.com/collections/chews-candy/products.json";
+      let pageRefBCediblesCandy = refBCfull.child( 'candy/' + dateToString);
+      fetch(urlBCediblesCandy, settings)
+          .then(res => res.json())
+          .then((JSONproductListediblesCandy) => {
+              pageRefBCediblesCandy.set(JSONproductListediblesCandy);
+              console.log('candy bc')
+              return;
+          });
+
+      // ONTARIO CANNABIS STORE (OCS)
+      // get collections and push to array
+      let urlDryOCS = "https://www.ocs.ca/collections/" + 'dried-flower-cannabis' + "/products.json";
+      let pageRefOCSdry = refOCSfull.child( 'dried-flower-cannabis/' + dateToString);
+      fetch(urlDryOCS, settings)
+          .then(res => res.json())
+          .then((JSONproductListDriedFlower) => {
           // console.log(json)
           // do something with JSON
-          pageRefOCSdry.set(JSONproductListDriedFlower);
-          console.log('dried flow')
-          return;
-        });
+            pageRefOCSdry.set(JSONproductListDriedFlower);
+            console.log('dried flower')
+            return;
+          });
 
-    let urlPre = "https://www.ocs.ca/collections/" + 'pre-rolled' + "/products.json";
-    let pageRefOCSpreRolled = refOCSfull.child('pre-rolled/' + dateToString);
-    fetch(urlPre, settings)
-        .then(res => res.json())
-        .then((JSONproductListPreRolled) => {
+      let urlPre = "https://www.ocs.ca/collections/" + 'pre-rolled' + "/products.json";
+      let pageRefOCSpreRolled = refOCSfull.child('pre-rolled/' + dateToString);
+      fetch(urlPre, settings)
+          .then(res => res.json())
+          .then((JSONproductListPreRolled) => {
           // console.log(json)
           // do something with JSON
-          pageRefOCSpreRolled.set(JSONproductListPreRolled);
-          console.log('pre roll')
-          return;
-        });
+            pageRefOCSpreRolled.set(JSONproductListPreRolled);
+            console.log('pre roll')
+            return;
+          });
 
-    let urlCapsule = "https://www.ocs.ca/collections/" + 'capsules' + "/products.json";
-    let pageRefOCScapsules = refOCSfull.child('capsules/' + dateToString);
-    fetch(urlCapsule, settings)
-        .then(res => res.json())
-        .then((JSONproductListCapsules) => {
+      let urlCapsule = "https://www.ocs.ca/collections/" + 'capsules' + "/products.json";
+      let pageRefOCScapsules = refOCSfull.child('capsules/' + dateToString);
+      fetch(urlCapsule, settings)
+          .then(res => res.json())
+          .then((JSONproductListCapsules) => {
           // do something with JSON
-          pageRefOCScapsules.set(JSONproductListCapsules);
-          console.log('capsule')
-          return;
-        });
+            pageRefOCScapsules.set(JSONproductListCapsules);
+            console.log('capsule')
+            return;
+          });
 
-    let urlOil = "https://www.ocs.ca/collections/" + 'oil' + "/products.json";
-    let pageRefOCSoil = refOCSfull.child('oil/' + dateToString);
-    fetch(urlOil, settings)
-        .then(res => res.json())
-        .then((JSONproductListOil) => {
+      let urlOil = "https://www.ocs.ca/collections/" + 'oil' + "/products.json";
+      let pageRefOCSoil = refOCSfull.child('oil/' + dateToString);
+      fetch(urlOil, settings)
+          .then(res => res.json())
+          .then((JSONproductListOil) => {
           // do something with JSON
-          pageRefOCSoil.set(JSONproductListOil);
-          console.log('oil')
-          return;
-        });
+            pageRefOCSoil.set(JSONproductListOil);
+            console.log('oil')
+            return;
+          });
 
-    let urlBestSellers = "https://www.ocs.ca/collections/" + 'best-sellers' + "/products.json";
-    let pageRefOCSbestSellers = refOCSfull.child( 'oil/' + dateToString);
-    fetch(urlBestSellers, settings)
-        .then(res => res.json())
-        .then((JSONproductListBestSellers) => {
+      let urlBestSellers = "https://www.ocs.ca/collections/" + 'best-sellers' + "/products.json";
+      let pageRefOCSbestSellers = refOCSfull.child( 'oil/' + dateToString);
+      fetch(urlBestSellers, settings)
+          .then(res => res.json())
+          .then((JSONproductListBestSellers) => {
           // do something with JSON
-          pageRefOCSbestSellers.set(JSONproductListBestSellers);
-          console.log('best seller')
-          return;
-        });
+            pageRefOCSbestSellers.set(JSONproductListBestSellers);
+            console.log('best seller')
+            return;
+          });
 
     ////////////////////////////////////////
     //
@@ -106,35 +178,13 @@ const getResults = async () => {
     ////////////////////////////////////////
 
   } else {
+      // TO DELETE DIRECTORIES
+      // db.ref('BC-BCCS/' ).remove().then(function(){
+      //     console.log('BC deleted')
+      // }).catch(function(){
+      //     console.log('BC not deleted')
+      // });
 
-    // OCSfull.0.{{GUID}}.0.date
-    let rawArray = [];
-    refOCSfull.on("value", function(snapshot) {
-      rawArray.push(snapshot.val())
-      // rawArray[0][Object.keys(rawArray[0])[0]] is the way to access the first data GUID as our data is in the first property value in the obj returned from firebase
-      let singleDayScrape = rawArray[0][Object.keys(rawArray[0])[0]];
-      let fullCategoryScrape = [];
-      // go through all records - n is arbitrary
-      const rawArrFirstVal = rawArray[0]
-      const numOfRecordsOnBranch = Object.keys(rawArrFirstVal).length;
-      for (let i = 0; i < numOfRecordsOnBranch; i++) {
-        // console.log(rawArrFirstVal);
-        // console.log(rawArrFirstVal[0].hasOwnProperty('date'))
-        // if (Object.keys(rawArrFirstVal)[i].date !== 'date') {
-        //   console.log(rawArrFirstVal[i])
-        //   fullCategoryScrape.push(rawArrFirstVal[Object.keys(rawArrFirstVal)[i]]);
-        // } else {
-        //   console.log('not a real date')
-        // }
-      }
-      let sortedByDateFullCategory = fullCategoryScrape.sort(function (left, right) {
-        return moment.utc(left.date).diff(moment.utc(right.date))
-      });
-      // console.log('sorted',sortedByDateFullCategory);
-    }, function (errorObject) {
-      // console.log("The read failed: " + errorObject.code);
-    });
-    return;
   };
   return;
 };
