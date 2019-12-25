@@ -43,7 +43,7 @@ const getResults = async () => {
 
     // get collections and push to array
     let urlDry = "https://www.ocs.ca/collections/" + 'dried-flower-cannabis' + "/products.json";
-    let pageRefOCSdry = refOCSfull.child('COLLECTION/' + 'dried-flower-cannabis' + dateToStr);
+    let pageRefOCSdry = refOCSfull.child('COLLECTION/' + 'dried-flower-cannabis' + dateToString);
     fetch(urlDry, settings)
         .then(res => res.json())
         .then((JSONproductListDriedFlower) => {
