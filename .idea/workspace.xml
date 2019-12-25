@@ -18,8 +18,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/scraper.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="45" column="95" selection-start-line="45" selection-start-column="95" selection-end-line="45" selection-end-column="95" />
+            <state relative-caret-position="229">
+              <caret line="31" column="33" selection-start-line="31" selection-start-column="33" selection-end-line="31" selection-end-column="33" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
@@ -40,7 +40,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>console.lo</find>
       <find>random</find>
       <find>helper</find>
       <find>new</find>
@@ -70,6 +69,7 @@
       <find>+ '/DATE/'</find>
       <find>dateToStrNoSpaces</find>
       <find>dateToStr</find>
+      <find>'COLLECTION/' +</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -168,12 +168,12 @@
       <workItem from="1572046679341" duration="31278000" />
       <workItem from="1572736037883" duration="23022000" />
       <workItem from="1573264825675" duration="5234000" />
-      <workItem from="1573410934047" duration="25172000" />
+      <workItem from="1573410934047" duration="25292000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="129978000" />
+    <option name="totallyTimeSpent" value="130098000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -369,8 +369,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/scraper.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="45" column="95" selection-start-line="45" selection-start-column="95" selection-end-line="45" selection-end-column="95" />
+        <state relative-caret-position="229">
+          <caret line="31" column="33" selection-start-line="31" selection-start-column="33" selection-end-line="31" selection-end-column="33" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>
