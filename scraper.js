@@ -179,13 +179,16 @@ const getResults = async () => {
           console.log('done writing to xls')
       });
 
-      // we need to take  db.ref('ONTARIO-OCS/oil').once
-      // iterate through DATE
-        // iterate through PRODUCTS
-            // iterate through OPTIONS
-                // iterate through VALUES
-                    // if VALUE == '1g' || if VALUE == '3.5g' || if VALUE == '7g'
-                    // DELETE PRODUCTS[INDEX]
+      // we need to take  db.ref('ONTARIO-OCS').once
+      // iterate through COLLECTIONS
+          // iterate through DATE
+            // iterate through PRODUCTS
+                // iterate through TAGS
+                    // if tag has string 'subcategory--' but not 'subsubcategory'
+                        // if subsubcategory has string 'Capsules'
+                        // if subsubcategory has string 'Dried Flower'
+                        // if subsubcategory has string 'Pre-Rolled'
+                        // if subsubcategory has string 'Oil' ??????????? we dont know this one
 
   };
   return;
