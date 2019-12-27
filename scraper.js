@@ -179,6 +179,14 @@ const getResults = async () => {
           console.log('done writing to xls')
       });
 
+      // we need to take  db.ref('ONTARIO-OCS/oil').once
+      // iterate through DATE
+        // iterate through PRODUCTS
+            // iterate through OPTIONS
+                // iterate through VALUES
+                    // if VALUE == '1g' || if VALUE == '3.5g' || if VALUE == '7g'
+                    // DELETE PRODUCTS[INDEX]
+
   };
   return;
 };
