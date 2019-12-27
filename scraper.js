@@ -1,10 +1,12 @@
 const fetch = require('node-fetch');
 const admin = require("firebase-admin");
+const fs = require('graceful-fs')
+const json2xls = require('json2xls');
 const date = new Date();
 const shouldRunScraper = true;
 let settings = { method: "Get" };
 
-// this function is called first
+// this function is called first => from app.js
 const getResults = async () => {
   // Get a database reference to our blog
   let db = admin.database();
@@ -168,6 +170,14 @@ const getResults = async () => {
       // }).catch(function(){
       //     console.log('BC not deleted')
       // });
+
+      // TO FETCH DIRECTORIES
+      db.ref('ONTARIO-OCS').once('value').then(function(snapshot) {
+          let snap = snapshot.val();
+          let xls = json2xls(snap);
+          fs.writeFileSync('data.xlsx', xls, 'binary')
+          console.log('done writing to xls')
+      });
 
   };
   return;
