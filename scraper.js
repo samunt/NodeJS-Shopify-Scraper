@@ -3,19 +3,58 @@ const admin = require("firebase-admin");
 const fs = require('graceful-fs')
 const json2xls = require('json2xls');
 const date = new Date();
-const shouldRunScraper = false; // SET THIS TO FALSE TO MAKE DATABASE MODIFICATIONS. IF TRUE YOU ARE RUNNING THE SCRAPER AS NORMAL
+const shouldRunScraper = true; // SET THIS TO FALSE TO MAKE DATABASE MODIFICATIONS. IF TRUE YOU ARE RUNNING THE SCRAPER AS NORMAL
 let settings = { method: "Get" };
 
 // this function is called first => from app.js
 const getResults = async () => {
-  // Get a database reference to our blog
-  let db = admin.database();
-  // create db path reference
-  let refOCSfull = db.ref("ONTARIO-OCS");
-  let refBCfull = db.ref("BC-BCCS");
-  let dateToString = date.toString();
-  // prep db references by adding a timestamp
-  if (shouldRunScraper === true) {
+    // Get a database reference to our blog
+    let db = admin.database();
+    // create db path reference
+    let refOCSfull = db.ref("ONTARIO-OCS");
+    let refBCfull = db.ref("BC-BCCS");
+    let dateToString = date.toString();
+
+
+
+    if (shouldRunScraper === true) {
+
+      let pathArray = ['driedFlowerBCCS',
+          'preRollsBCCS',
+          'vapeCartridgesBCCS',
+          'oilProductsBCCS',
+          'capsulesBCCS',
+          'bakedGoodsBCCS',
+          'chocolateBCCS',
+          'chewsCandy',
+          'driedFlowerOCS',
+          'preRollsOCS',
+          'capsulesOCS',
+          'oilProductsOCS',
+          'bestSellersOCS'];
+      let urlArray = ["https://www.bccannabisstores.com/collections/flower/product.json",
+          "https://www.bccannabisstores.com/collections/pre-rolls/products.json",
+          "https://www.bccannabisstores.com/collections/vape-kits-cartridges/products.json",
+          "https://www.bccannabisstores.com/collections/oil-products/products.json",
+          "https://www.bccannabisstores.com/collections/capsules/products.json",
+          "https://www.bccannabisstores.com/collections/baked-goods-snacks/products.json",
+          "https://www.bccannabisstores.com/collections/chocolate/products.json",
+          "https://www.bccannabisstores.com/collections/chews-candy/products.json",
+          "https://www.ocs.ca/collections/dried-flower-cannabis/products.json",
+          "https://www.ocs.ca/collections/pre-rolled/products.json",
+          "https://www.ocs.ca/collections/capsules/products.json",
+          "https://www.ocs.ca/collections/oils/products.json",
+          "https://www.ocs.ca/collections/best-sellers/products.json"
+      ];
+      // let refArray = [refOCSfull, refBCfull]
+      //
+      // for (let index = 0; index < refArray.length; j++) {
+      //     let pageRef = refArray[index].child()
+      //     for (let i = 0; i < urlArray.length; i++) {
+      //
+      //     }
+      // };
+
       // BC CANNABIS STORE
 
       let urlDryBC = "https://www.bccannabisstores.com/collections/flower/product.json";
@@ -195,15 +234,19 @@ const getResults = async () => {
       //     arrayOfCollections.push(OCSdatabase.preRolled);
       //     console.log(arrayOfCollections);
       // });
-      // iterate through COLLECTIONS
-          // iterate through DATE
-            // iterate through PRODUCTS
-                // iterate through TAGS
-                    // if tag has string 'subcategory--' but not 'subsubcategory'
-                        // if subsubcategory has string 'Capsules' and we are not in the capsules section
-                        // if subsubcategory has string 'Dried Flower' and we are not in the dry flower collection
-                        // if subsubcategory has string 'Pre-Rolled' and we are not in the prerolled collection => move to collection[prerolled]/DATE/PRODUCTS
-                        // if subsubcategory has string 'Oil' ??????????? we dont know this one
+
+      // FIND PRICE PER MG IN THE OCS
+      // iterate through {{COLLECTIONS}}
+        // inside collection, iterate through {{DATES}}
+            // inside date, iterate through PRODUCTS[INDEX]
+                // if CAPSULES
+                    // iterate through product[i].options
+                        // iterate through product[i].options[j].values
+                            // push values to array called numberOfCapsulesPerBottle
+                    // check 'body_html' and 'handle' and 'title' for the word "mg"
+                            // push the value to an array of arrays, since each product can have multiple hints as to the mg per capsule
+                            // perform some sort of check and push a best guess into an array called arrayOfMgPerCapsule
+                //
 
   };
   return;
