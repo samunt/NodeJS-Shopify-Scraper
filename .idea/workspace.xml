@@ -18,11 +18,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/scraper.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="190" column="95" selection-start-line="190" selection-start-column="95" selection-end-line="190" selection-end-column="95" />
-              <folding>
-                <element signature="e#2561#6432#0" />
-              </folding>
+            <state relative-caret-position="194">
+              <caret line="33" column="14" selection-start-line="33" selection-start-column="14" selection-end-line="33" selection-end-column="14" />
             </state>
           </provider>
         </entry>
@@ -58,8 +55,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>shopify</find>
-      <find>grams</find>
       <find>shop</find>
       <find>ocs</find>
       <find>fetch</find>
@@ -88,6 +83,8 @@
       <find>pre</find>
       <find>getResults</find>
       <find>.json</find>
+      <find>pre roll</find>
+      <find>oil</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -187,12 +184,12 @@
       <workItem from="1572046679341" duration="31278000" />
       <workItem from="1572736037883" duration="23022000" />
       <workItem from="1573264825675" duration="5234000" />
-      <workItem from="1573410934047" duration="30224000" />
+      <workItem from="1573410934047" duration="32109000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="135030000" />
+    <option name="totallyTimeSpent" value="136915000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -383,11 +380,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/scraper.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="190" column="95" selection-start-line="190" selection-start-column="95" selection-end-line="190" selection-end-column="95" />
-          <folding>
-            <element signature="e#2561#6432#0" />
-          </folding>
+        <state relative-caret-position="194">
+          <caret line="33" column="14" selection-start-line="33" selection-start-column="14" selection-end-line="33" selection-end-column="14" />
         </state>
       </provider>
     </entry>
