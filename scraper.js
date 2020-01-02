@@ -2,6 +2,7 @@ const fetch = require('node-fetch');
 const admin = require("firebase-admin");
 const fs = require('graceful-fs')
 const json2xls = require('json2xls');
+const _ = require('lodash');
 const date = new Date();
 const shouldRunScraper = true; // SET THIS TO FALSE TO MAKE DATABASE MODIFICATIONS. IF TRUE YOU ARE RUNNING THE SCRAPER AS NORMAL
 let settings = { method: "Get" };
@@ -241,16 +242,13 @@ const getResults = async () => {
               for (let j = 0; j < tags.length; j++) {
                   if (tags[j].includes("Capsules")) {
                       capsuleArray.push(arr[i]);
-                      // this works great! only problem is the list is repeated 7 times??
                   }
               }
           }
-
-
-          // console.log(capsuleArray);
-
-          let snap = capsuleArray;
-          let xls = json2xls(snap);
+          // get rid of duplicates
+          capsuleArray = _.uniqBy(capsuleArray, 'id')
+          // prepare for export to xls
+          let xls = json2xls(capsuleArray);
           fs.writeFileSync('data.xlsx', xls, 'binary')
           console.log('done writing to xls')
       })
