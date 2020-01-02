@@ -224,16 +224,36 @@ const getResults = async () => {
 
 
       // we need to take  db.ref('ONTARIO-OCS').once
-      // db.ref('ONTARIO-OCS').once('value').then(function(snapshot) {
-      //     let OCSdatabase = snapshot.val();
-      //     let arrayOfCollections = []
-      //     arrayOfCollections.push(OCSdatabase.capsules);
-      //     arrayOfCollections.push(OCSdatabase.oil);
-      //     arrayOfCollections.push(OCSdatabase.capsules);
-      //     arrayOfCollections.push(OCSdatabase.driedFlowerCannabis);
-      //     arrayOfCollections.push(OCSdatabase.preRolled);
-      //     console.log(arrayOfCollections);
-      // });
+      db.ref('ONTARIO-OCS/capsules').once('value').then(function(snapshot) {
+          let allCapsules = snapshot.val();
+          let arr = [];
+          let capsuleArray = [];
+
+          // load all the capsule stuff into an array
+          for (let i = 0; i < Object.keys(allCapsules).length; i++) { // number of dates in the collection
+              let date = Object.keys(allCapsules)[i];
+              arr.push(allCapsules[date])
+          }
+          // flatten out the array
+          arr = arr.flatMap(({products}) => products);
+          for (let i = 0; i < arr.length; i++) {
+              let tags = arr[i].tags;
+              for (let j = 0; j < tags.length; j++) {
+                  if (tags[j].includes("Capsules")) {
+                      capsuleArray.push(arr[i]);
+                      // this works great! only problem is the list is repeated 7 times??
+                  }
+              }
+          }
+
+
+          // console.log(capsuleArray);
+
+          let snap = capsuleArray;
+          let xls = json2xls(snap);
+          fs.writeFileSync('data.xlsx', xls, 'binary')
+          console.log('done writing to xls')
+      })
 
       // FIND PRICE PER MG IN THE OCS
       // iterate through {{COLLECTIONS}}
@@ -244,9 +264,9 @@ const getResults = async () => {
                         // iterate through product[i].options[j].values
                             // push values to array called numberOfCapsulesPerBottle
                     // check 'body_html' and 'handle' and 'title' for the word "mg"
-                            // push the value to an array of arrays, since each product can have multiple hints as to the mg per capsule
+                            // push the first value to an arrays, since each product can have multiple hints as to the mg per capsule
                             // perform some sort of check and push a best guess into an array called arrayOfMgPerCapsule
-                //
+                // console.log
 
   };
   return;
