@@ -18,13 +18,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/scraper.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="7" column="29" selection-start-line="7" selection-start-column="29" selection-end-line="7" selection-end-column="29" />
-              <folding>
-                <element signature="e#720#816#0" />
-                <element signature="e#731#1398#0" />
-                <element signature="e#9334#9354#0" />
-              </folding>
+            <state relative-caret-position="206">
+              <caret line="302" column="31" selection-start-line="302" selection-start-column="31" selection-end-line="302" selection-end-column="31" />
             </state>
           </provider>
         </entry>
@@ -69,12 +64,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>$</find>
-      <find>shouldRunScraper</find>
-      <find>url</find>
-      <find>json</find>
-      <find>pageRefOCS</find>
-      <find>dat</find>
       <find>date</find>
       <find>datetostr</find>
       <find>guid</find>
@@ -99,6 +88,12 @@
       <find>cron</find>
       <find>console.</find>
       <find>eva</find>
+      <find>push</find>
+      <find>.child</find>
+      <find>preRollProductBreakdownArray</find>
+      <find>async</find>
+      <find>AsArrayOfProducts</find>
+      <find>mgperpree</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -198,12 +193,12 @@
       <workItem from="1572046679341" duration="31278000" />
       <workItem from="1572736037883" duration="23022000" />
       <workItem from="1573264825675" duration="5234000" />
-      <workItem from="1573410934047" duration="62439000" />
+      <workItem from="1573410934047" duration="65251000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="167245000" />
+    <option name="totallyTimeSpent" value="170057000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -232,7 +227,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.35036495" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.37226278" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -411,13 +406,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/scraper.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="29" selection-start-line="7" selection-start-column="29" selection-end-line="7" selection-end-column="29" />
-          <folding>
-            <element signature="e#720#816#0" />
-            <element signature="e#731#1398#0" />
-            <element signature="e#9334#9354#0" />
-          </folding>
+        <state relative-caret-position="206">
+          <caret line="302" column="31" selection-start-line="302" selection-start-column="31" selection-end-line="302" selection-end-column="31" />
         </state>
       </provider>
     </entry>
