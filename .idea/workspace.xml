@@ -3,6 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="3266437e-fc66-45dd-933c-8e6008e88b27" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scraper.js" beforeDir="false" afterPath="$PROJECT_DIR$/scraper.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -19,12 +21,21 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/scraper.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="6" column="29" selection-start-line="6" selection-start-column="29" selection-end-line="6" selection-end-column="29" />
+            <state relative-caret-position="190">
+              <caret line="316" column="108" selection-start-line="316" selection-start-column="95" selection-end-line="316" selection-end-column="108" />
               <folding>
                 <element signature="e#9334#9354#0" />
                 <element signature="e#10924#10944#0" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node_modules/mathjs/lib/expression/node/SymbolNode.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="145">
+              <caret line="114" column="10" selection-start-line="114" selection-start-column="10" selection-end-line="114" selection-end-column="10" />
             </state>
           </provider>
         </entry>
@@ -42,7 +53,7 @@
         <entry file="file://$PROJECT_DIR$/package.json">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="140">
-              <caret line="20" column="26" selection-start-line="20" selection-start-column="26" selection-end-line="20" selection-end-column="26" />
+              <caret line="21" column="26" selection-start-line="21" selection-start-column="26" selection-end-line="21" selection-end-column="26" />
             </state>
           </provider>
         </entry>
@@ -60,7 +71,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>fetch</find>
       <find>$</find>
       <find>shouldRunScraper</find>
       <find>url</find>
@@ -90,6 +100,7 @@
       <find>oil</find>
       <find>cron</find>
       <find>console.</find>
+      <find>eva</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -189,12 +200,12 @@
       <workItem from="1572046679341" duration="31278000" />
       <workItem from="1572736037883" duration="23022000" />
       <workItem from="1573264825675" duration="5234000" />
-      <workItem from="1573410934047" duration="58186000" />
+      <workItem from="1573410934047" duration="62049000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="162992000" />
+    <option name="totallyTimeSpent" value="166855000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -223,7 +234,7 @@
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.3970803" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" visible="true" weight="0.35036495" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -376,17 +387,34 @@
     <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="140">
-          <caret line="20" column="26" selection-start-line="20" selection-start-column="26" selection-end-line="20" selection-end-column="26" />
+          <caret line="21" column="26" selection-start-line="21" selection-start-column="26" selection-end-line="21" selection-end-column="26" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/database.rules.json">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/mathjs/es/entry/mainAny.js">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/mathjs/main/esm/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="32" lean-forward="true" selection-start-column="32" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/mathjs/lib/expression/node/SymbolNode.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="145">
+          <caret line="114" column="10" selection-start-line="114" selection-start-column="10" selection-end-line="114" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/scraper.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="29" selection-start-line="6" selection-start-column="29" selection-end-line="6" selection-end-column="29" />
+        <state relative-caret-position="190">
+          <caret line="316" column="108" selection-start-line="316" selection-start-column="95" selection-end-line="316" selection-end-column="108" />
           <folding>
             <element signature="e#9334#9354#0" />
             <element signature="e#10924#10944#0" />

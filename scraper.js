@@ -3,10 +3,10 @@ const admin = require("firebase-admin");
 const fs = require('graceful-fs')
 const json2xls = require('json2xls');
 const _ = require('lodash');
+const mathjs = require('mathjs');
 const date = new Date();
-const shouldRunScraper = true; // SET THIS TO FALSE TO MAKE DATABASE MODIFICATIONS. IF TRUE YOU ARE RUNNING THE SCRAPER AS NORMAL
+const shouldRunScraper = false; // SET THIS TO FALSE TO MAKE DATABASE MODIFICATIONS. IF TRUE YOU ARE RUNNING THE SCRAPER AS NORMAL
 let settings = { method: "Get" };
-
 // this function is called first => from app.js
 const getResults = async () => {
     // Get a database reference to our blog
@@ -262,6 +262,8 @@ const getResults = async () => {
                 let allPreRolls = snapshot.val();
                 let arr = [];
                 let preRollArr = [];
+                let model = {};
+                let productBreakdownArray = [];
 
                 // load all the pre roll stuff into an array
                 for (let i = 0; i < Object.keys(allPreRolls).length; i++) { // number of dates in the collection
@@ -282,20 +284,9 @@ const getResults = async () => {
                 }
 
                 preRollArr = _.uniqBy(preRollArr, 'id');
-                let model = {
-                    productName: null,
-                    rollsPerPack: null,
-                    thc: null,
-                    cbd: null,
-                    mgPerPreRollthc: null,
-                    mgPerPreRollcbd: null,
-                    mgTHCperPack: null,
-                    mgCBDperPack: null,
-                    brandName: null,
-                    sku: null,
-                    totalGramsPerPack: null
-                };
-                let productBreakdownArray = []
+                function getSecondPart(str) {
+                    return str.split('*')[1];
+                }
                 preRollArr.forEach((product) => {
                     for (let i = 0; i < product.options[0].values.length; i++) {
 
@@ -305,20 +296,29 @@ const getResults = async () => {
                         let cbd = _.filter(product.tags, (s) => {
                             return s.indexOf( 'cbd_content_max' ) !== -1;
                         });
+                        // rollsEquation is actually either just the grams of the 1 joint in the pack, like 0.5g
+                        // or it is an equation like 4*0.5 meaning that is has 2g per pack
+                        let rollsEquation = (product.options[0].values[i].slice(0, -1)).replace('x', '*');
+                        let gramsPerPack = rollsEquation.includes('*') ? mathjs.evaluate(rollsEquation) : rollsEquation;
 
                         model.thc               =  thc[0].replace("thc_content_max--", "");
                         model.cbd               =  cbd[0].replace("cbd_content_max--", "");
+                        model.totalGramsPerPack =  gramsPerPack;
                         model.productName       =  product.handle;
-                        model.rollsPerPack      =  product.options[0].values[i].slice(0, -1);
-                        model.mgPerPreRollthc   =  (model.thc * model.gramsPerBottle);
-                        model.mgPerPreRollcbd   =  (model.cbd * model.gramsPerBottle);
-                        model.mgTHCperPack      =  (model.mgPerGthc * model.gramsPerBottle);
-                        model.mgCBDperPack      =  (model.mgPerGcbd * model.gramsPerBottle);
+                        model.rollsPerPack      =  rollsEquation.includes('*') ? parseInt(rollsEquation.substring(0, rollsEquation.indexOf('*'))) : 1;
+                        model.mgPerGthc         =  (model.thc * 10);
+                        model.mgPerGcbd         =  (model.cbd * 10);
+                        model.mgPerPreRollthc   =  ((model.thc * 10) * (model.totalGramsPerPack / model.rollsPerPack));
+                        model.mgPerPreRollcbd   =  ((model.cbd * 10) * (model.totalGramsPerPack / model.rollsPerPack));
+                        model.mgTHCperPack      =  model.totalGramsPerPack * (model.thc * 10);
+                        model.mgCBDperPack      =  model.totalGramsPerPack * (model.cbd * 10);;
                         model.brandName         =  product.vendor;
                         model.sku               =  product.variants[i].sku;
-                        // model.totalGramsPerPack =  eval(new String(model.rollsPerPack))
+                        model.preRollSize       =  rollsEquation.includes('*') ? getSecondPart(rollsEquation) : rollsEquation;
 
                         productBreakdownArray.push(model);
+
+                        model = {};
 
                     }
                 });
@@ -402,18 +402,6 @@ const getResults = async () => {
         // scrapeDryBud();
         scrapePreRolls();
 
-        // FIND PRICE PER MG IN THE OCS
-        // iterate through {{COLLECTIONS}}
-        // inside collection, iterate through {{DATES}}
-        // inside date, iterate through PRODUCTS[INDEX]
-        // if CAPSULES
-        // iterate through product[i].options
-        // iterate through product[i].options[j].values
-        // push values to array called numberOfCapsulesPerBottle
-        // check 'body_html' and 'handle' and 'title' for the word "mg"
-        // push the first value to an arrays, since each product can have multiple hints as to the mg per capsule
-        // perform some sort of check and push a best guess into an array called arrayOfMgPerCapsule
-        // console.log
 
     };
     return;
