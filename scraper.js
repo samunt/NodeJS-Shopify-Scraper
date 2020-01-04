@@ -4,7 +4,7 @@ const fs = require('graceful-fs')
 const json2xls = require('json2xls');
 const _ = require('lodash');
 const date = new Date();
-const shouldRunScraper = true; // SET THIS TO FALSE TO MAKE DATABASE MODIFICATIONS. IF TRUE YOU ARE RUNNING THE SCRAPER AS NORMAL
+const shouldRunScraper = false; // SET THIS TO FALSE TO MAKE DATABASE MODIFICATIONS. IF TRUE YOU ARE RUNNING THE SCRAPER AS NORMAL
 let settings = { method: "Get" };
 
 // this function is called first => from app.js
@@ -225,33 +225,110 @@ const getResults = async () => {
 
 
       // we need to take  db.ref('ONTARIO-OCS').once
-      db.ref('ONTARIO-OCS/capsules').once('value').then(function(snapshot) {
-          let allCapsules = snapshot.val();
-          let arr = [];
-          let capsuleArray = [];
+      let scrapeCapsules = () => {
+          db.ref('ONTARIO-OCS/capsules').once('value').then(function(snapshot) {
+              let allCapsules = snapshot.val();
+              let arr = [];
+              let capsuleArray = [];
 
-          // load all the capsule stuff into an array
-          for (let i = 0; i < Object.keys(allCapsules).length; i++) { // number of dates in the collection
-              let date = Object.keys(allCapsules)[i];
-              arr.push(allCapsules[date])
-          }
-          // flatten out the array
-          arr = arr.flatMap(({products}) => products);
-          for (let i = 0; i < arr.length; i++) {
-              let tags = arr[i].tags;
-              for (let j = 0; j < tags.length; j++) {
-                  if (tags[j].includes("Capsules")) {
-                      capsuleArray.push(arr[i]);
+              // load all the capsule stuff into an array
+              for (let i = 0; i < Object.keys(allCapsules).length; i++) { // number of dates in the collection
+                  let date = Object.keys(allCapsules)[i];
+                  arr.push(allCapsules[date])
+              }
+              // flatten out the array
+              arr = arr.flatMap(({products}) => products);
+              for (let i = 0; i < arr.length; i++) {
+                  let tags = arr[i].tags;
+                  for (let j = 0; j < tags.length; j++) {
+                      if (tags[j].includes("Capsules")) {
+                          capsuleArray.push(arr[i]);
+                      }
                   }
               }
-          }
-          // get rid of duplicates
-          capsuleArray = _.uniqBy(capsuleArray, 'id')
-          // prepare for export to xls
-          let xls = json2xls(capsuleArray);
-          fs.writeFileSync('data.xlsx', xls, 'binary')
-          console.log('done writing to xls')
-      })
+              // get rid of duplicates
+              capsuleArray = _.uniqBy(capsuleArray, 'id');
+
+
+              // prepare for export to xls
+              // let xls = json2xls(capsuleArray);
+              // fs.writeFileSync('data.xlsx', xls, 'binary')
+              // console.log('done writing to xls')
+          })
+      }
+
+      let scrapeDryBud = () => {
+          db.ref('ONTARIO-OCS/driedFlowerCannabis').once('value').then(function(snapshot) {
+              let allBud = snapshot.val();
+              let arr = [];
+              let budArray = [];
+
+              // load all the capsule stuff into an array
+              for (let i = 0; i < Object.keys(allBud).length; i++) { // number of dates in the collection
+                  let date = Object.keys(allBud)[i];
+                  arr.push(allBud[date])
+              }
+              // flatten out the array
+              arr = arr.flatMap(({products}) => products);
+              for (let i = 0; i < arr.length; i++) {
+                  let tags = arr[i].tags;
+
+                  for (let j = 0; j < tags.length; j++) {
+
+                      if (tags[j].includes("Dried Flower")) {
+                          budArray.push(arr[i]);
+                          console.log("push")
+                      }
+                  }
+              }
+              // console.log(budArray);
+
+              // get rid of duplicates
+              budArray = _.uniqBy(budArray, 'id');
+              let model = {
+                productName: null,
+                gramsPerBottle: null,
+                thc: null,
+                cbd: null,
+                mgPerGthc: null,
+                mgPerGcbd: null,
+                mgTHCperBottle: null,
+                mgCBDperBottle: null,
+                brandName: null,
+                sku: null
+              };
+              let productBreakdownArray = []
+              budArray.forEach((product) => {
+                  for (let i = 0; i < product.options[0].values.length; i++) {
+
+                      let thc = _.filter(product.tags, (s) => {
+                          return s.indexOf( 'thc_content_max' ) !== -1;
+                      });
+                      let cbd = _.filter(product.tags, (s) => {
+                          return s.indexOf( 'cbd_content_max' ) !== -1;
+                      });
+
+                      model.thc            =  thc[0].replace("thc_content_max--", "");
+                      model.cbd            =  cbd[0].replace("cbd_content_max--", "");
+                      model.productName    =  product.handle;
+                      model.gramsPerBottle =  product.options[0].values[i].slice(0, -1);
+                      model.mgPerGthc      =  (model.thc * model.gramsPerBottle);
+                      model.mgPerGcbd      =  (model.cbd * model.gramsPerBottle);
+                      model.mgTHCperBottle =  (model.mgPerGthc * model.gramsPerBottle);
+                      model.mgCBDperBottle =  (model.mgPerGcbd * model.gramsPerBottle);
+                      model.brandName      =  product.vendor;
+                      model.sku            =  product.variants[i].sku;
+
+                      productBreakdownArray.push(model);
+
+                  }
+              });
+          })
+
+      }
+
+      // scrapeCapsules();
+      scrapeDryBud()
 
       // FIND PRICE PER MG IN THE OCS
       // iterate through {{COLLECTIONS}}
