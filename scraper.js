@@ -5,7 +5,7 @@ const json2xls = require('json2xls');
 const _ = require('lodash');
 const mathjs = require('mathjs');
 const date = new Date();
-const shouldRunScraper = false; // SET THIS TO FALSE TO MAKE DATABASE MODIFICATIONS. IF TRUE YOU ARE RUNNING THE SCRAPER AS NORMAL
+const shouldRunScraper = true; // SET THIS TO FALSE TO MAKE DATABASE MODIFICATIONS. IF TRUE YOU ARE RUNNING THE SCRAPER AS NORMAL
 let settings = { method: "Get" };
 // this function is called first => from app.js
 const getResults = async () => {
@@ -47,15 +47,6 @@ const getResults = async () => {
             "https://www.ocs.ca/collections/oils/products.json",
             "https://www.ocs.ca/collections/best-sellers/products.json"
         ];
-        // let refArray = [refOCSfull, refBCfull]
-        //
-        // for (let index = 0; index < refArray.length; j++) {
-        //     let pageRef = refArray[index].child()
-        //     for (let i = 0; i < urlArray.length; i++) {
-        //
-        //     }
-        // };
-
         // BC CANNABIS STORE
 
         let urlDryBC = "https://www.bccannabisstores.com/collections/flower/product.json";
@@ -282,14 +273,18 @@ const getResults = async () => {
                         }
                     }
                 }
-
+                // remove all duplicates
                 preRollArr = _.uniqBy(preRollArr, 'id');
+
+                // this is a function to find out how many grams in a pre roll
                 function getSecondPart(str) {
                     return str.split('*')[1];
                 }
+
                 preRollArr.forEach((product) => {
                     for (let i = 0; i < product.options[0].values.length; i++) {
 
+                        // this is how we get the thc and cbd from the tags
                         let thc = _.filter(product.tags, (s) => {
                             return s.indexOf( 'thc_content_max' ) !== -1;
                         });
@@ -322,9 +317,6 @@ const getResults = async () => {
 
                     }
                 });
-                console.log(productBreakdownArray);
-
-
             });
         };
 
@@ -333,6 +325,8 @@ const getResults = async () => {
                 let allBud = snapshot.val();
                 let arr = [];
                 let budArray = [];
+                let productBreakdownArray = []
+                let model = {};
 
                 // load all the dry bud stuff into an array
                 for (let i = 0; i < Object.keys(allBud).length; i++) { // number of dates in the collection
@@ -356,19 +350,6 @@ const getResults = async () => {
 
                 // get rid of duplicates
                 budArray = _.uniqBy(budArray, 'id');
-                let model = {
-                    productName: null,
-                    gramsPerBottle: null,
-                    thc: null,
-                    cbd: null,
-                    mgPerGthc: null,
-                    mgPerGcbd: null,
-                    mgTHCperBottle: null,
-                    mgCBDperBottle: null,
-                    brandName: null,
-                    sku: null
-                };
-                let productBreakdownArray = []
                 budArray.forEach((product) => {
                     for (let i = 0; i < product.options[0].values.length; i++) {
 
@@ -394,12 +375,13 @@ const getResults = async () => {
 
                     }
                 });
-            })
+                console.log(productBreakdownArray);
+            });
 
         };
 
         // scrapeCapsules();
-        // scrapeDryBud();
+        scrapeDryBud();
         scrapePreRolls();
 
 
