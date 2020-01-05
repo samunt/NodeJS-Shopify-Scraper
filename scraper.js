@@ -269,8 +269,8 @@ const getResults = () => {
             // remove all duplicates
             preRollArr = _.uniqBy(preRollArr, 'id');
 
-            // this is a function to find out how many grams in a pre roll
-            function getSecondPart(str) {
+            // this is a function to find out how many grams in a pre roll by playing with the string
+            function howManyGramsInPreRoll(str) {
                 return str.split('*')[1];
             }
 
@@ -302,7 +302,7 @@ const getResults = () => {
                     model.mgCBDperPack      =  model.totalGramsPerPack * (model.cbd * 10);;
                     model.brandName         =  product.vendor;
                     model.sku               =  product.variants[i].sku;
-                    model.preRollSize       =  rollsEquation.includes('*') ? getSecondPart(rollsEquation) : rollsEquation;
+                    model.preRollSize       =  rollsEquation.includes('*') ? howManyGramsInPreRoll(rollsEquation) : rollsEquation;
 
                     // do a check for pre rolls with an issue
                     model.mgPerPreRollthc = isNaN(model.mgPerPreRollthc) ? null : model.mgPerPreRollthc;
@@ -322,7 +322,7 @@ const getResults = () => {
         });
     };
 
-    let scrapeDryBud = async() => {
+    let scrapeDryBud = () => {
         db.ref('ONTARIO-OCS/driedFlowerCannabis').once('value').then((snapshot) => {
             let allBud = snapshot.val();
             let arr = [];
