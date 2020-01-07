@@ -3,17 +3,18 @@ let express = require('express');
 let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
-const getResults = require("./scraper");
+const getResults = require('./scraper');
+const aggregator = require('./aggregator')
 
 let app = express();
 
-let admin = require("firebase-admin");
-let serviceAccount = require("./on-scrape-firebase-adminsdk-qhq3k-e963c283df.json");
+let admin = require('firebase-admin');
+let serviceAccount = require('./on-scrape-firebase-adminsdk-qhq3k-e963c283df.json');
 
 // initialize firebase
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://single-cistern-137723.firebaseio.com/"
+  databaseURL: 'https://single-cistern-137723.firebaseio.com/'
 });
 
 
@@ -47,9 +48,10 @@ app.post('/schedule', function (req, res) {
 // self executing func to trigger the scraper
 (async function() {
   await getResults();
+  await aggregator();
 })();
 
 module.exports = app;
 
 const port = 9000;
-app.listen(port, () => console.log('App starting...'))
+app.listen(port, () => console.log('STARTING...'))
