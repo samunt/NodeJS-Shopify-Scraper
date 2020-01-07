@@ -13,7 +13,7 @@ const getResults = () => {
     let db = admin.database();
     let refOCSfull = db.ref("ONTARIO-OCS");
     let refBCfull = db.ref("BC-BCCS");
-    let metaStats = db.ref("metaStats");
+    let metaStatsOCS = db.ref("metaStatsOCS");
 
     let dateToString = date.toString();
 
@@ -185,6 +185,10 @@ const getResults = () => {
             return;
         });
 
+
+
+
+
     ////////////////////////////////////////
     //
     //  FULL PRODUCT LISTING FROM OCS ABOVE
@@ -214,7 +218,7 @@ const getResults = () => {
             let allCapsules = snapshot.val();
             let arr = [];
             let capsuleArray = [];
-
+            let model = {};
             // load all the capsule stuff into an array
             for (let i = 0; i < Object.keys(allCapsules).length; i++) { // number of dates in the collection
                 let date = Object.keys(allCapsules)[i];
@@ -233,6 +237,35 @@ const getResults = () => {
             // get rid of duplicates
             capsuleArray = _.uniqBy(capsuleArray, 'id');
 
+            capsuleArray.forEach((product) => {
+                for (let i = 0; i < product.options[0].values.length; i++) {
+
+                    // this is how we get the thc and cbd from the tags
+                    let thc = _.filter(product.tags, (s) => {
+                        return s.indexOf( 'thc_content_max' ) !== -1;
+                    });
+                    let cbd = _.filter(product.tags, (s) => {
+                        return s.indexOf( 'cbd_content_max' ) !== -1;
+                    });
+
+                    model.productName       =  product.handle;
+                    model.mgPerMlthc        =  null;
+                    model.mgPerMlbd         =  null;
+                    model.mgPerPreRollthc   =  null;
+                    model.mgPerPreRollcbd   =  null;
+                    model.mgTHCperPack      =  null;
+                    model.mgCBDperPack      =  null;
+                    model.brandName         =  product.vendor;
+                    model.sku               =  product.variants[i].sku;
+
+                    capsuleArray.push(model);
+
+                    model = {};
+                }
+            });
+            let pageRefCapsule = metaStatsOCS.child( 'capsuleStatisticsAsArrayOfProducts/' + dateToString);
+            pageRefCapsule.set(preRollProductBreakdownArray);
+            console.log('set capsule ============')
 
             // prepare for export to xls
             // let xls = json2xls(capsuleArray);
@@ -247,7 +280,6 @@ const getResults = () => {
             let arr = [];
             let preRollArr = [];
             let model = {};
-            let productBreakdownArray = [];
 
             // load all the pre roll stuff into an array
             for (let i = 0; i < Object.keys(allPreRolls).length; i++) { // number of dates in the collection
@@ -314,8 +346,7 @@ const getResults = () => {
                     model = {};
                 }
             });
-            let pageRefPreRoll = metaStats.child( 'preRollStatisticsAsArrayOfProducts/' + dateToString);
-            console.log(preRollProductBreakdownArray)
+            let pageRefPreRoll = metaStatsOCS.child( 'preRollStatisticsAsArrayOfProducts/' + dateToString);
             pageRefPreRoll.set(preRollProductBreakdownArray);
             console.log('set pre roll ============')
 
@@ -376,18 +407,18 @@ const getResults = () => {
 
                 }
             });
-            let pageRefDryBud  = metaStats.child('dryBudStatisticsAsArrayOfProducts/' + dateToString);
+            let pageRefDryBud  = metaStatsOCS.child('dryBudStatisticsAsArrayOfProducts/' + dateToString);
             pageRefDryBud.set(dryBudProductBreakdownArray);
             console.log('set dry bud ============')
         });
     };
 
+
+
+    // -------------- PUSH DATA TO STATS DB ------------------
     // scrapeCapsules();
     scrapeDryBud(); // at the end of this function an array is filled which is what we push
     scrapePreRolls(); // at the end of this function an array is filled which is what we push
-
-    // -------------- PUSH DATA TO STATS DB ------------------
-
     console.log('done')
 };
 
