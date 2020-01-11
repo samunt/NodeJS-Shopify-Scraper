@@ -47,7 +47,7 @@ app.post('/schedule', function (req, res) {
 
 // self executing func to trigger the scraper
 (async function() {
-  await getResults();
+  await getResults()
   await aggregator();
 })();
 
