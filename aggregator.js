@@ -90,6 +90,7 @@ const aggregate = () => {
     }
 
     let scrapeDryBud = () => {
+        console.log('<><><><><><><><SCRAPEDrYBUD<><><><><><')
         db.ref('ONTARIO-OCS/driedFlowerCannabis').once('value').then((snapshot) => {
             let allBud = snapshot.val();
             let arr = [];
@@ -150,6 +151,7 @@ const aggregate = () => {
     };
 
     let scrapePreRolls = () => {
+        console.log('<><><><><><><><SCRAPEPREROLLS<><><><><><')
         db.ref('ONTARIO-OCS/preRolled').once('value').then((snapshot) => {
             let allPreRolls = snapshot.val();
             let arr = [];
@@ -182,6 +184,7 @@ const aggregate = () => {
             }
 
             preRollArr.forEach((product) => {
+                console.log('pre roll measurement =============><><>');
                 for (let i = 0; i < product.options[0].values.length; i++) {
 
                     // this is how we get the thc and cbd from the tags

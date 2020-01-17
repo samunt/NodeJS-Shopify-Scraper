@@ -124,6 +124,17 @@ const getResults = () => {
 
     // ONTARIO CANNABIS STORE (OCS)
     // get collections and push to array
+
+    let urlVapeOCS = "https://www.ocs.ca/collections/" + 'cartridges' + "/products.json";
+    let pageRefOCSvape = refOCSfull.child('cartridges/' + dateToString);
+    fetch(urlVapeOCS, settings)
+        .then(res => res.json())
+        .then((JSONproductListCartridges) => {
+           pageRefOCSvape.set(JSONproductListCartridges);
+           console.log('VAPES <><><><><><><><><><><>>');
+           return;
+        });
+
     let urlDryOCS = "https://www.ocs.ca/collections/" + 'dried-flower-cannabis' + "/products.json";
     let pageRefOCSdry = refOCSfull.child( 'driedFlowerCannabis/' + dateToString);
     fetch(urlDryOCS, settings)
