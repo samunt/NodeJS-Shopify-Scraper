@@ -131,8 +131,38 @@ const getResults = () => {
         .then(res => res.json())
         .then((JSONproductListCartridges) => {
            pageRefOCSvape.set(JSONproductListCartridges);
-           console.log('VAPES <><><><><><><><><><><>>');
+           console.log('VAPES');
            return;
+        });
+
+    let urlConfOCS = "https://www.ocs.ca/collections/" + 'confectionary' + "/products.json";
+    let pageRefOCSconf = refOCSfull.child('confectionary/' + dateToString);
+    fetch(urlConfOCS, settings)
+        .then(res => res.json())
+        .then((JSONproductListConf) => {
+            pageRefOCSconf.set(JSONproductListConf);
+            console.log('Conf ');
+            return;
+        });
+
+    let urlbeveragesOCS = "https://www.ocs.ca/collections/" + 'beverages' + "/products.json";
+    let pageRefOCSbeverages = refOCSfull.child('beverages/' + dateToString);
+    fetch(urlbeveragesOCS, settings)
+        .then(res => res.json())
+        .then((JSONproductListBev) => {
+            pageRefOCSbeverages.set(JSONproductListBev);
+            console.log('bev ');
+            return;
+        });
+
+    let urlbakedOCS = "https://www.ocs.ca/collections/" + 'baked-goods' + "/products.json";
+    let pageRefOCSbaked = refOCSfull.child('baked-goods/' + dateToString);
+    fetch(urlbakedOCS, settings)
+        .then(res => res.json())
+        .then((JSONproductListBaked) => {
+            pageRefOCSbaked.set(JSONproductListBaked);
+            console.log('baked ');
+            return;
         });
 
     let urlDryOCS = "https://www.ocs.ca/collections/" + 'dried-flower-cannabis' + "/products.json";

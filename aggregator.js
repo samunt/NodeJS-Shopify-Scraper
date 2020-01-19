@@ -3,19 +3,15 @@ const json2xls = require('json2xls');
 const _ = require('lodash');
 const mathjs = require('mathjs');
 const admin = require("firebase-admin");
+const shouldDeleteData = false;
 // this function is called second => from app.js
 const aggregate = () => {
+
     let date = new Date()
     let db = admin.database();
     let metaStatsOCS = db.ref("metaStatsOCS");
     let dateToString = date.toString();
 
-    // TO DELETE DIRECTORIES
-    // db.ref('metaStats/' ).remove().then(function(){
-    //     console.log('--------------------deleted')
-    // }).catch(function(){
-    //     console.log('--------------------not deleted')
-    // });
 
     // TO FETCH DIRECTORIES
     // db.ref('ONTARIO-OCS').once('value').then(function(snapshot) {
@@ -24,7 +20,19 @@ const aggregate = () => {
     //     fs.writeFileSync('data.xlsx', xls, 'binary')
     //     console.log('done writing to xls')
     // });
-
+    if (shouldDeleteData == true) {
+        // TO DELETE DIRECTORIES
+        db.ref('cartridgesFri\xa0Jan\xa017\xa02020\xa016:47:45\xa0GMT-0500\xa0(Eastern\xa0Standard\xa0Time)' ).remove().then(function(){
+            console.log('--------------------deleted')
+        }).catch(function(){
+            console.log('--------------------not deleted')
+        });
+        db.ref('cartridgesFri Jan 17 2020 16:49:38 GMT-0500 (Eastern Standard Time)' ).remove().then(function(){
+            console.log('--------------------deleted')
+        }).catch(function(){
+            console.log('--------------------not deleted')
+        });
+    }
 
     let preRollProductBreakdownArray = [];
     let dryBudProductBreakdownArray = [];
@@ -90,7 +98,6 @@ const aggregate = () => {
     }
 
     let scrapeDryBud = () => {
-        console.log('<><><><><><><><SCRAPEDrYBUD<><><><><><')
         db.ref('ONTARIO-OCS/driedFlowerCannabis').once('value').then((snapshot) => {
             let allBud = snapshot.val();
             let arr = [];
@@ -151,7 +158,6 @@ const aggregate = () => {
     };
 
     let scrapePreRolls = () => {
-        console.log('<><><><><><><><SCRAPEPREROLLS<><><><><><')
         db.ref('ONTARIO-OCS/preRolled').once('value').then((snapshot) => {
             let allPreRolls = snapshot.val();
             let arr = [];
