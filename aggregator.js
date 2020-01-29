@@ -190,7 +190,6 @@ const aggregate = () => {
             }
 
             preRollArr.forEach((product) => {
-                console.log('pre roll measurement =============><><>');
                 for (let i = 0; i < product.options[0].values.length; i++) {
 
                     // this is how we get the thc and cbd from the tags

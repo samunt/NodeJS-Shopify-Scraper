@@ -47,7 +47,7 @@ app.post('/schedule', function (req, res) {
 
 // self executing func to trigger the scraper
 (async function() {
-  await Promise.all([getResults(), aggregator()]);
+  await Promise.all([getResults() ]);
 })();
 
 module.exports = app;
