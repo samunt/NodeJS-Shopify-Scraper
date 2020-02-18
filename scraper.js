@@ -9,7 +9,7 @@ const getResults = () => {
     // create db path reference
     let db = admin.database();
     // TODO add your firebase database reference
-    let refOCSfull = db.ref("YourDBreference");
+    let dbReference = db.ref("YourDBreference");
 
     let dateToString = date.toString();
     // TODO Add your collections to this array to identify what collection you are scraping in the DB
@@ -22,9 +22,9 @@ const getResults = () => {
     for (let i = 0; i < urlArray.length; i++) {
         if (pathArray.length === urlArray.length) {
             let jsonURL = urlArray[i];
-            let provinceRef = i <= 7 ? refBCfull : refOCSfull;
+            let pathRef = dbReference;
             let pathFromShopify = pathArray[i];
-            let pageRef = provinceRef.child(pathFromShopify + "/" + dateToString);
+            let pageRef = pathRef.child(pathFromShopify + "/" + dateToString);
             fetch(jsonURL, settings)
                 .then(res => res.json())
                 .then((JSONproductList) => {
