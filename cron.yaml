@@ -1,5 +1,6 @@
 version: 1
-cron: 
+cron:
+#  TODO Choose a schedule if you want
   - name: "task1"
     url: "/scheduled"
     schedule: "0 1 * * *"

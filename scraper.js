@@ -8,34 +8,15 @@ const getResults = () => {
     // Get a database reference to our blog
     // create db path reference
     let db = admin.database();
-    let refOCSfull = db.ref("ONTARIO-OCS");
-    let refBCfull = db.ref("BC-BCCS");
+    // TODO add your firebase database reference
+    let refOCSfull = db.ref("YourDBreference");
 
     let dateToString = date.toString();
+    // TODO Add your collections to this array to identify what collection you are scraping in the DB
+    let pathArray = ['driedFlowerCannabis'];
 
-    let pathArray = ['driedFlowerCannabis', 'preRolls', 'vapeKitsCartridges', 'oilProducts',
-        'capsules', 'bakedGoodsSnacks', 'chocolate', 'candy',
-        'driedFlowerCannabis', 'preRolled', 'capsules', 'oilProducts',
-        'bestSellers', 'cartridges', 'confectionary', 'beverages', 'baked-goods'];
-    let urlArray = ["https://www.bccannabisstores.com/collections/flower/product.json",
-        "https://www.bccannabisstores.com/collections/pre-rolls/products.json",
-        "https://www.bccannabisstores.com/collections/vape-kits-cartridges/products.json",
-        "https://www.bccannabisstores.com/collections/oil-products/products.json",
-        "https://www.bccannabisstores.com/collections/capsules/products.json",
-        "https://www.bccannabisstores.com/collections/baked-goods-snacks/products.json",
-        "https://www.bccannabisstores.com/collections/chocolate/products.json",
-        "https://www.bccannabisstores.com/collections/chews-candy/products.json",
-
-        "https://www.ocs.ca/collections/dried-flower-cannabis/products.json",
-        "https://www.ocs.ca/collections/pre-rolled/products.json",
-        "https://www.ocs.ca/collections/capsules/products.json",
-        "https://www.ocs.ca/collections/oils/products.json",
-        "https://www.ocs.ca/collections/best-sellers/products.json",
-        "https://www.ocs.ca/collections/cartridges/products.json",
-        "https://www.ocs.ca/collections/confectionary/products.json",
-        "https://www.ocs.ca/collections/beverages/products.json",
-        "https://www.ocs.ca/collections/baked-goods/products.json",
-    ];
+    // TODO Add your URLs to this array to scrape the data in the CORRESPONDING pathArray Index
+    let urlArray = ["https://www.bccannabisstores.com/collections/flower/product.json"];
 
     // capture stores using Shopify
     for (let i = 0; i < urlArray.length; i++) {

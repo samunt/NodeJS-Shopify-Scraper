@@ -1,5 +1,6 @@
+// TODO remove this and add your DB name to "", something like red-unicorn-1289398
 {
   "projects": {
-    "default": "single-cistern-137723"
+    "default": ""
   }
 }

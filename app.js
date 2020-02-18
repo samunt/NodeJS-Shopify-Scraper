@@ -1,20 +1,18 @@
-let createError = require('http-errors');
-let express = require('express');
-let path = require('path');
-let cookieParser = require('cookie-parser');
-let logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 const getResults = require('./scraper');
-const aggregator = require('./aggregator')
-
-let app = express();
-
-let admin = require('firebase-admin');
-let serviceAccount = require('./on-scrape-firebase-adminsdk-qhq3k-e963c283df.json');
+const app = express();
+const admin = require('firebase-admin');
+const serviceAccount = require('./firebaseServiceAccount.json');
 
 // initialize firebase
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://single-cistern-137723.firebaseio.com/'
+  // TODO Change the link to your firebase link
+  databaseURL: 'https://myfirebaselink.firebaseio.com/'
 });
 
 
@@ -34,6 +32,7 @@ app.use(function(req, res, next) {
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
+  //TODO change the environment if you want
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page
@@ -46,8 +45,9 @@ app.post('/schedule', function (req, res) {
 });
 
 // self executing func to trigger the scraper
-(async function() {
-  await Promise.all([getResults(), aggregator() ]);
+// can also trigger
+(function() {
+  getResults();
 })();
 
 module.exports = app;
