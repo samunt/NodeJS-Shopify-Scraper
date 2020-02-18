@@ -13,10 +13,10 @@ const getResults = () => {
 
     let dateToString = date.toString();
     // TODO Add your collections to this array to identify what collection you are scraping in the DB
-    let pathArray = ['driedFlowerCannabis'];
+    let pathArray = ['someArbitraryShopifyCollectionDescription'];
 
     // TODO Add your URLs to this array to scrape the data in the CORRESPONDING pathArray Index
-    let urlArray = ["https://www.bccannabisstores.com/collections/flower/product.json"];
+    let urlArray = ["https://www.someShopifyStore/collections/someShopifyCollection/product.json"];
 
     // capture stores using Shopify
     for (let i = 0; i < urlArray.length; i++) {
