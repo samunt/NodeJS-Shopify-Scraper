@@ -5,17 +5,6 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const getResults = require('./scraper');
 const app = express();
-const admin = require('firebase-admin');
-const serviceAccount = require('./firebaseServiceAccount.json');
-
-// initialize firebase
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  // TODO Change the link to your firebase link
-  databaseURL: 'https://myfirebaselink.firebaseio.com/'
-});
-
-
 
 app.use(logger('dev'));
 app.use(express.json());
