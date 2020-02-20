@@ -1,4 +1,4 @@
-Welcome to the Shopify scrape for NodeJS!
+Welcome to the simplest Shopify scraper for NodeJS!
 
 Use this as a starter application to effectively scrape a Shopify website. You can run it from the console, or deploy it with a cronjob to scrape and save data to your DB around the clock!
 
