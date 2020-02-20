@@ -1,7 +1,7 @@
 {
-  "name": "ocs-node-scrape",
-  "version": "0.0.0",
-  "private": true,
+  "name": "shopify scrape",
+  "version": "2.0.1",
+  "private": false,
   "scripts": {
     "start": "node ./bin/www"
   },
@@ -10,13 +10,10 @@
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
-    "firebase-admin": "^8.6.1",
     "graceful-fs": "^4.2.3",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "json2xls": "^0.1.2",
-    "lodash": "^4.17.15",
-    "mathjs": "^6.3.0",
     "moment": "^2.24.0",
     "morgan": "~1.9.1",
     "node-fetch": "^2.6.0"
