@@ -1,6 +1,6 @@
-Welcome to the Shopify scrape for NodeJS, utilizing Google Firebase!
+Welcome to the Shopify scrape for NodeJS!
 
-Use this as a starter application to effectively scrape a Shopify website. You can run it from the console, or deploy it with a cronjob to scrape and save data to Firebase around the clock!
+Use this as a starter application to effectively scrape a Shopify website. You can run it from the console, or deploy it with a cronjob to scrape and save data to your DB around the clock!
 
 1. Find all the "TODO"s throughout the application to see what info you need to update
 2. To start the app run "npm i" then "node app.js"
