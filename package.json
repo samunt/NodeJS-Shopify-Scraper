@@ -1,7 +1,8 @@
 {
-  "name": "shopify scrape",
+  "name": "shopify-scrape",
   "version": "2.0.1",
   "private": false,
+  "main": "scraper.js",
   "scripts": {
     "start": "node ./bin/www"
   },
